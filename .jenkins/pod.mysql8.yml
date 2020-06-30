@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: Pod
+spec:
+  # <leo-ci:affinity>
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: nodetype
+                operator: In
+                values: ["builds"]
+  # </leo-ci:affinity>
+  containers:
+    - name: node
+      image: eu.gcr.io/leo-platform-infra/leo-ci/build/node:12.16-slim
+      imagePullPolicy: Always
+      securityContext:
+        runAsUser: 1000
+      env:
+      - name: CI
+        value: true
+      command:
+      - cat
+      tty: true
+      resources:
+        requests:
+          cpu: 2
+          memory: 2Gi
+        limits:
+          cpu: 4
+          memory: 4Gi
+    # <leo-ci:containers>
+    - name: maven
+      image: eu.gcr.io/leo-platform-infra/leo-ci/maven:3-jdk-8
+      imagePullPolicy: Always
+      securityContext:
+        runAsUser: 1000
+      command: ["cat"]
+      tty: true
+      resources:
+        requests:
+          cpu: 2
+          memory: 2Gi
+        limits:
+          cpu: 4
+          memory: 4Gi
+
+    - name: docker
+      image: eu.gcr.io/leo-platform-infra/leo-ci/docker:18.09-dind
+      env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /etc/gcp/credentials.json
+      command:
+        - cat
+      tty: true
+      securityContext:
+        privileged: true
+      volumeMounts:
+        - name: service-account-credentials
+          mountPath: /etc/gcp
+          readOnly: true
+        - name: dockersock
+          mountPath: /var/run/docker.sock
+    # </leo-ci:containers>
+    # <leo-ci:containers-mysql>
+    - name: mysql
+      image: mysql:8.0.19
+      args: ["--default-authentication-plugin=mysql_native_password"]
+      env:
+        - { name: MYSQL_ROOT_PASSWORD,  value: 'xxxx'       }
+        - { name: MYSQL_DATABASE,       value: 'leoci'      }
+        - { name: MYSQL_USER,           value: 'leoci'      }
+        - { name: MYSQL_PASSWORD,       value: 'boll#plank' }
+    # </leo-ci:containers-mysql>
+    # <leo-ci:containers-rabbitmq>
+    - name: rabbitmq
+      image: rabbitmq:3
+      env:
+        - { name: RABBITMQ_DEFAULT_VHOST, value: 'platform' }
+        - { name: RABBITMQ_DEFAULT_USER,  value: 'platform_service' }
+        - { name: RABBITMQ_DEFAULT_PASS,  value: '00wcvGF2hZynVBiAvhkazBXiccjnAhKMVXvZh84ftEMODbpJG4' }
+    # </leo-ci:containers-rabbitmq>
+
+  volumes:
+    # <leo-ci:volumes>
+    - name: service-account-credentials
+      secret:
+        secretName: google-application-credentials
+        items:
+          - key: credentials.json
+            path: credentials.json
+    - name: dockersock
+      hostPath:
+        path: /var/run/docker.sock
+    # </leo-ci:volumes>

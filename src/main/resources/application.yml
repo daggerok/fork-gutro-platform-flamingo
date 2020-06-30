@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: flamingo
+  jpa:
+    hibernate:
+      naming:
+        physical-strategy: "org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl"
+    open-in-view: false
+
+server:
+  servlet:
+    context-path: /flamingo
+
+logging:
+  level:
+    root: INFO
+
+---
+
+spring:
+  profiles: default
+  cloud:
+    consul:
+      enabled: true
+      # host: 10.90.18.10:8500 # dev-mr
+      host: 10.90.16.11:8500 # malta-stage
+      prefix: platform-config
+      defaultContext: flamingo

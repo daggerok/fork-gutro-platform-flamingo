@@ -1,0 +1,11 @@
+.errorContainer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .tryAgainButton {
+    margin-top: 20px;
+  }
+}

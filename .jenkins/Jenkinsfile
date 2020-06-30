@@ -1,0 +1,239 @@
+#!/usr/bin/env groovy
+
+/* <leo-ci:head>
+  Github Repository       | https://github.com/gutro/ee-delivery/
+  Delivery Documentation  | https://delivery-docs.leo-platform-infra.lvg-tech.net/docs/build/pipeline/
+  Jenkins Pipeline Syntax | https://jenkins.io/doc/book/pipeline/syntax/
+</leo-ci:head> */
+
+// <leo-ci:vars>
+/* Pipeline variables */
+// </leo-ci:vars>
+
+pipeline {
+  agent {
+    // <leo-ci:agent>
+    kubernetes {
+      label "build-java-service-${UUID.randomUUID().toString()}"
+      yamlFile '.jenkins/pod.yml'
+    }
+    // </leo-ci:agent>
+  }
+  options {
+    // <leo-ci:options>
+    buildDiscarder(logRotator(numToKeepStr: '30'))
+    timeout(time: 1, unit: 'HOURS')
+    disableConcurrentBuilds()
+    // </leo-ci:options>
+  }
+  environment {
+    // <leo-ci:env>
+    LEOCI_MAVEN_USER      = credentials('nexus-user')
+    LEOCI_MAVEN_PASSWORD  = credentials('nexus-password')
+    GITHUB_USER           = credentials('github-rhino-user')
+    GITHUB_PASSWORD       = credentials('github-rhino-password')
+    GCR_REPO              = 'eu.gcr.io/leo-platform-infra/artifacts'
+    GIT_COMMIT_SHORT      = "${GIT_COMMIT[0..6]}"
+    SNAPSHOT_VERSION      = "${CHANGE_BRANCH ?: BRANCH_NAME}-SNAPSHOT".replace('/', '-')
+    PROJECT_NAME          = GIT_URL.split('/').last().minus('.git')
+    GITHUB_URL            = GIT_URL.replace( //Add username and password to git url to make writable github url
+        'https://',
+        "https://${GITHUB_USER}:${GITHUB_PASSWORD}@"
+    )
+    // </leo-ci:env>
+    LEOCI_NPM_TOKEN = credentials('npm-token')
+  }
+  stages {
+    // <leo-ci:stage-prepare>
+    stage('Prepare') {
+      steps {
+        container('maven') {
+          sh(script: 'leo-ci login maven', label: 'Login to Maven')
+          sh(script: 'leo-ci cache restore --checksum=$(leo-ci maven checksum) .mvn/repository', label: 'Download Cache')
+        }
+      }
+    }
+    // </leo-ci:stage-prepare>
+    stage('Prepare Frontend') {
+      steps {
+        container('node') {
+          dir('src/main/javascript') {
+            sh(script: 'leo-ci login npm', label: 'Yarn Login')
+            sh(script: 'yarn install', label: 'Yarn Install Dependencies')
+            sh(script: 'yarn build', label: 'Yarn Build')
+          }
+        }
+      }
+    }
+    // <leo-ci:stage-version>
+    stage('Set version') {
+      parallel {
+        stage('Release version') {
+          when { branch 'master' }
+          steps {
+            container('maven') {
+              sh(script: '''
+                RELEASE_VERSION=$(git ls-remote --tags ${GITHUB_URL} | sort -k2 -V | awk -F/ 'END { print ($NF ? $NF : "0.0.0") }')
+                RELEASE_VERSION=$(echo $RELEASE_VERSION | awk -F. '{ print ($1)"."($2)"."($3+1) }')
+                mvn versions:set -DnewVersion="$RELEASE_VERSION"
+              ''', label: 'Set new version')
+              script {
+                currentBuild.displayName = sh(script: 'leo-ci maven version', returnStdout: true)
+              }
+            }
+          }
+        }
+        stage('Snapshot version') {
+          when { not { branch 'master' } }
+          steps {
+            container('maven') {
+              sh(script: 'mvn versions:set -DnewVersion="$SNAPSHOT_VERSION"', label: 'Set new version')
+              script {
+                currentBuild.displayName = sh(script: 'leo-ci maven version', returnStdout: true)
+              }
+            }
+          }
+        }
+      }
+    }
+    // </leo-ci:stage-version>
+    // <leo-ci:stage-compile>
+    /* To be removed */
+    // </leo-ci:stage-compile>
+    // <leo-ci:stage-verify>
+    stage('Test and Package') {
+      parallel {
+        stage('MySQL 5') {
+          steps {
+            container('maven') {
+              sh(script: 'mvn jar:jar source:jar verify', label: 'Maven Verify')
+              sh(script: '''
+                ARTIFACTS=$(mvn -q jar:jar exec:exec -Dexec.executable='echo' -Dexec.args='${project.build.directory}/${project.build.finalName}.${project.packaging}|${project.groupId}/${project.artifactId}|${project.version}')
+                echo "$ARTIFACTS" | while read artifact; do
+                  JAR_FILE=$(echo "$artifact" | awk -F'|' '{ print $1 }')
+                  if unzip -p $JAR_FILE META-INF/MANIFEST.MF | grep -q 'Main-Class:'; then
+                    echo "$artifact"
+                  fi
+                done > .jenkins/runnable-jars
+              ''', label: 'Detect Runnable Jars')
+            }
+          }
+        }
+        stage(' ') {
+          when { expression {
+            return sh(script: 'grep -rq -m1 --include="*.xml" "<databaseChangeLog" .', returnStatus: true) == 0
+          }}
+          stages {
+            stage('MySQL 8') {
+              agent {
+                kubernetes {
+                  label "build-java-service-mysql8-${UUID.randomUUID().toString()}"
+                  yamlFile '.jenkins/pod.mysql8.yml'
+                }
+              }
+              steps {
+                container('maven') {
+                  sh(script: 'leo-ci login maven', label: 'Login to Maven')
+                  sh(script: 'leo-ci cache restore .mvn/repository', label: 'Download Cache')
+                  catchError {
+                    sh(script: 'mvn verify', label: 'Maven Verify')
+                  }
+                  junit(testResults: '**/target/surefire-reports/**/TEST-*.xml', allowEmptyResults: true)
+                  junit(testResults: '**/target/failsafe-reports/**/TEST-*.xml', allowEmptyResults: true)
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    // </leo-ci:stage-verify>
+    // <leo-ci:stage-release>
+    stage('Push') {
+      parallel {
+        stage('Maven Artifacts') {
+          steps {
+            container('maven') {
+              sh(script: """#!/bin/bash
+                set -eo pipefail
+                leo-ci maven deploy | tee .jenkins/mvn-deploy-log
+              """, label: 'Push to Artifactory')
+              sh(script: 'grep "Uploaded" .jenkins/mvn-deploy-log | awk \'{ print $5 }\'', label: 'Produced Artifacts')
+            }
+          }
+        }
+        stage('Docker Images') {
+          when { expression { 
+            return sh(script: 'test -s .jenkins/runnable-jars', returnStatus: true) == 0
+          }}
+          steps {
+            container('docker') {
+              sh(script: 'leo-ci login gcr', label: 'Docker login')
+              sh(script: '''
+                while read ARTIFACT; do
+                  JAR_FILE=$(echo "$ARTIFACT" | awk -F'|' '{ print $1 }')
+                  IMAGE_NAME=$(echo "$ARTIFACT" | awk -F'|' '{ print $2 }')
+                  IMAGE_TAG=$(echo "$ARTIFACT" | awk -F'|' '{ print $3 }')
+
+                  echo '**\\n!*.jar' > $(dirname $JAR_FILE)/.dockerignore
+                  if (! test -f .jenkins/Dockerfile); then
+                    leo-ci file Dockerfile.maven > .jenkins/Dockerfile
+                  fi
+
+                  docker build --compress \
+                    --build-arg jar=$(basename $JAR_FILE) \
+                    --build-arg LABEL_URL=${BUILD_URL} \
+                    --build-arg LABEL_TITLE=$(basename $JAR_FILE .jar) \
+                    --build-arg LABEL_SOURCE=${GIT_URL} \
+                    --build-arg LABEL_REVISION=${GIT_COMMIT} \
+                    --build-arg LABEL_VERSION=$(leo-ci maven version) \
+                    --build-arg LABEL_CREATED=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
+                    --tag "$GCR_REPO/$IMAGE_NAME:$IMAGE_TAG" \
+                    --tag "$GCR_REPO/$IMAGE_NAME:$SNAPSHOT_VERSION-$GIT_COMMIT_SHORT" \
+                    --file .jenkins/Dockerfile \
+                    $(dirname $JAR_FILE)
+
+                  docker push "$GCR_REPO/$IMAGE_NAME:$IMAGE_TAG"
+                  docker push "$GCR_REPO/$IMAGE_NAME:$SNAPSHOT_VERSION-$GIT_COMMIT_SHORT"
+
+                  echo "$GCR_REPO/$IMAGE_NAME:$IMAGE_TAG" >> .jenkins/docker-images
+                  echo "$GCR_REPO/$IMAGE_NAME:$SNAPSHOT_VERSION-$GIT_COMMIT_SHORT" >> .jenkins/docker-images
+                done < .jenkins/runnable-jars
+              ''', label: 'Build and Push Docker Images')
+              sh(script: 'cat .jenkins/docker-images', label: 'Produced Docker Images')
+            }
+          }
+        }
+        stage('Cache') {
+          steps {
+            container('maven') {
+              sh(script: 'leo-ci cache store --checksum=$(leo-ci maven checksum) .mvn/repository', label: 'Upload Cache')
+            }
+          }
+        }
+      }
+    }
+    // </leo-ci:stage-release>
+    // <leo-ci:stage-push-tag>
+    stage('Release') {
+      when { branch 'master' }
+      steps {
+        container('maven') {
+          sh(script: '''
+            git tag $(leo-ci maven version)
+            git push $GITHUB_URL --tags
+          ''', label: 'Push new version tag to Github')
+        }
+      }
+    }
+    // </leo-ci:stage-push-tag>
+  }
+  post {
+    // <leo-ci:post>
+    always {
+      junit(testResults: '**/target/surefire-reports/**/TEST-*.xml', allowEmptyResults: true)
+      junit(testResults: '**/target/failsafe-reports/**/TEST-*.xml', allowEmptyResults: true)
+    }
+    // </leo-ci:post>
+  }
+}

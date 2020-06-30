@@ -1,0 +1,20 @@
+.layout {
+  width: 100vw;
+  height: 100vh;
+}
+
+.menu {
+  display: inline-block;
+}
+
+.divider {
+  flex-grow: 1;
+}
+
+.logoutButton {
+  display: inline-block;
+}
+
+.content {
+  padding: 20px;
+}
