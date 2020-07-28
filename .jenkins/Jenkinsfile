@@ -7,7 +7,7 @@
 </leo-ci:head> */
 
 // <leo-ci:vars>
-/* Pipeline variables */
+def downstreamJobs = []
 // </leo-ci:vars>
 
 pipeline {
@@ -106,7 +106,7 @@ pipeline {
         stage('MySQL 5') {
           steps {
             container('maven') {
-              sh(script: 'mvn jar:jar source:jar verify', label: 'Maven Verify')
+              sh(script: 'mvn source:jar verify', label: 'Maven Verify')
               sh(script: '''
                 ARTIFACTS=$(mvn -q jar:jar exec:exec -Dexec.executable='echo' -Dexec.args='${project.build.directory}/${project.build.finalName}.${project.packaging}|${project.groupId}/${project.artifactId}|${project.version}')
                 echo "$ARTIFACTS" | while read artifact; do
@@ -134,7 +134,7 @@ pipeline {
               steps {
                 container('maven') {
                   sh(script: 'leo-ci login maven', label: 'Login to Maven')
-                  sh(script: 'leo-ci cache restore .mvn/repository', label: 'Download Cache')
+                  sh(script: 'leo-ci cache restore --checksum=$(leo-ci maven checksum) .mvn/repository', label: 'Download Cache')
                   catchError {
                     sh(script: 'mvn verify', label: 'Maven Verify')
                   }
@@ -163,7 +163,7 @@ pipeline {
           }
         }
         stage('Docker Images') {
-          when { expression { 
+          when { expression {
             return sh(script: 'test -s .jenkins/runnable-jars', returnStatus: true) == 0
           }}
           steps {
@@ -233,6 +233,29 @@ pipeline {
     always {
       junit(testResults: '**/target/surefire-reports/**/TEST-*.xml', allowEmptyResults: true)
       junit(testResults: '**/target/failsafe-reports/**/TEST-*.xml', allowEmptyResults: true)
+    }
+    success {
+      container('maven') {
+        sh(script: "leo-ci cache store --checksum=${PROJECT_NAME}-${GIT_COMMIT} .", label: 'Upload Workspace')
+
+        script { // Trigger hook jobs
+          def listJobs = { sh(script: "leo-ci jobs list ${it}", returnStdout: true).trim().split() }
+          if (env.CHANGE_BRANCH) {
+            downstreamJobs.addAll(listJobs('Hooks/pull-request'))
+          } else if (env.BRANCH_NAME == 'master') {
+            downstreamJobs.addAll(listJobs('Hooks/master'))
+          } else {
+            downstreamJobs.addAll(listJobs('Hooks/branch'))
+          }
+
+          downstreamJobs.each {
+            build(job: it, parameters: [
+                string(name: 'GIT_URL', value: GIT_URL),
+                string(name: 'GIT_COMMIT', value: GIT_COMMIT)
+            ], wait: false)
+          }
+        }
+      }
     }
     // </leo-ci:post>
   }
