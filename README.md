@@ -16,7 +16,7 @@ The backend application will both serve any static files put in the `resources/s
 
 To run the backend, either open IntelliJ and go to `Application.kt` and click start, or open a terminal and run:
 ```bash
-/platform-flamingo > $ mvn clean compile exec:java
+/platform-flamingo > $ mvn clean compile exec:java
 ```
 
 The backend is hosted locally on [http://localhost:8080/flamingo](http://localhost:8080/flamingo)

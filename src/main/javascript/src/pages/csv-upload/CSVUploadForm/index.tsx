@@ -8,6 +8,7 @@ import {
   message,
 } from 'antd';
 import { UploadFile, UploadChangeParam, RcCustomRequestOptions } from 'antd/lib/upload/interface';
+import { Rule } from 'antd/lib/form';
 import { Store } from 'antd/lib/form/interface';
 import { ResultStatusType } from 'antd/lib/result';
 import { InboxOutlined } from '@ant-design/icons';
@@ -63,6 +64,15 @@ const getResultPopupMessage = (key: string | number): string => {
 const FORM_RULES = {
   csvFiles: [
     { required: true, message: 'Please upload at least one file' },
+    { validator: (rule: Rule, value: Array<UploadFile>): Promise<void> => {
+      const fileNames = value.map(it => it.name);
+      const uniqueFileNames = new Set(fileNames);
+
+      if (uniqueFileNames.size !== fileNames.length) {
+        return Promise.reject('You can\'t upload the same file multiple times.');
+      }
+      return Promise.resolve();
+    }},
   ],
   scheduleDate: [
     { required: true, message: 'Please select a schedule date' },
@@ -107,7 +117,11 @@ const CSVUploadForm: React.FC = () => {
     axios.post(`${config.apiPath}/campaign-scheduling/`, {
       schedulingPromotions,
     })
-      .then(() => {
+      .then((res) => {
+        if (res.data.error) {
+          throw new Error(res.data.error);
+        }
+
         setIsLoading(false);
         setResultPopup({ status: 'success' });
         form.resetFields();
@@ -142,7 +156,7 @@ const CSVUploadForm: React.FC = () => {
       <ConfirmationModal
         open={confirmationModalOpen}
         setOpen={setConfirmationModalOpen}
-        schedulingPromotionCount={(schedulingPromotions || []).length}
+        schedulingPromotionCount={(schedulingPromotions || []).length}
         onOkClick={handleConfirmationModalOkClick}
       ></ConfirmationModal>
 
@@ -166,11 +180,13 @@ const CSVUploadForm: React.FC = () => {
             accept=".csv"
             customRequest={mockUploadRequest}
           >
-            <p className="ant-upload-drag-icon">
-              <InboxOutlined />
-            </p>
-            <p className="ant-upload-text">Click or drag files to this area to upload</p>
-            <p className="ant-upload-hint">You can schedule multiple files at the same time</p>
+            <div className={styles.draggerInnerContainer}>
+              <p className="ant-upload-drag-icon">
+                <InboxOutlined />
+              </p>
+              <p className="ant-upload-text">Click or drag files to this area to upload</p>
+              <p className="ant-upload-hint">You can schedule multiple files at the same time</p>
+            </div>
           </Upload.Dragger>
         </Form.Item>
 

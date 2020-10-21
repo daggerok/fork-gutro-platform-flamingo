@@ -2,10 +2,18 @@
   padding: 10px;
 }
 
+.draggerInnerContainer {
+  padding: 10px;
+}
+
 .datePicker {
   width: 100%;
 }
 
 .submitButtonContainer {
   text-align: center;
+}
+
+:global(.ant-upload-list-item-card-actions-btn) {
+  opacity: 1 !important;
 }
