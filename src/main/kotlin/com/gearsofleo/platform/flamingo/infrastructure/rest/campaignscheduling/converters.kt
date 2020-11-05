@@ -2,11 +2,12 @@ package com.gearsofleo.platform.flamingo.infrastructure.rest.campaignscheduling
 
 import com.gearsofleo.platform.aux.optimove.integration.api.PlatformAuxOptimoveIntegrationApiProtos.SchedulingPromotionDTO
 import com.gearsofleo.platform.aux.optimove.integration.api.PlatformAuxOptimoveIntegrationCommandApiProtos.SchedulingCampaignWithPromotionsCommand
+import kotlin.math.abs
 
 fun CampaignSchedulingCommandJson.toCommand(): SchedulingCampaignWithPromotionsCommand =
     SchedulingCampaignWithPromotionsCommand.newBuilder()
         .addAllSchedulingPromotions(schedulingPromotions.map { it.toDTO() })
-        .setExternalId((Math.random() * 10000000).toLong())
+        .setExternalId(getExternalIdFromScheduleListHash(schedulingPromotions))
         .build()
 
 fun CampaignSchedulingRowJson.toDTO(): SchedulingPromotionDTO {
@@ -17,4 +18,10 @@ fun CampaignSchedulingRowJson.toDTO(): SchedulingPromotionDTO {
     scheduled?.let { builder.setScheduled(it) }
 
     return builder.build()
+}
+
+fun getExternalIdFromScheduleListHash (list: List<CampaignSchedulingRowJson>) : Long {
+    return abs(
+        list.map { Pair(it.playerUid, it.promotionUid) }.toString().hashCode()
+    ).toLong()
 }

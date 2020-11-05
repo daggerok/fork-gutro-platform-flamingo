@@ -25,6 +25,9 @@ class CampaignSchedulingResource(val optimoveIntClient: OptimoveIntClient) {
 
             CampaignSchedulingResponseJson(null)
         } catch (e: Exception) {
+            if (e.message?.contains("Campaign with that externalId already exists") == true) {
+                return CampaignSchedulingResponseJson("That exact combination of players and promotions have already been scheduled previously.\nPlease make sure your actions are intended.\n\nTo find out when it was scheduled last time please contact the Retention team in #plat-retention-public.")
+            }
             CampaignSchedulingResponseJson(e.message)
         }
     }

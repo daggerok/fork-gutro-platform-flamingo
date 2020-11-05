@@ -116,6 +116,8 @@ const CSVUploadForm: React.FC = () => {
 
     axios.post(`${config.apiPath}/campaign-scheduling/`, {
       schedulingPromotions,
+    }, {
+      timeout: 60000,
     })
       .then((res) => {
         if (res.data.error) {

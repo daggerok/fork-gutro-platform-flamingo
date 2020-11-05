@@ -15,6 +15,14 @@ logging:
   level:
     root: INFO
 
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 15000
+        readTimeout: 60000
+        loggerLevel: basic
+
 ---
 
 spring:
@@ -22,7 +30,7 @@ spring:
   cloud:
     consul:
       enabled: true
-      # host: 10.90.18.10:8500 # dev-mr
-      host: 10.90.16.11:8500 # malta-stage
+      host: 10.90.18.10:8500 # dev-mr
+      # host: 10.90.16.11:8500 # malta-stage
       prefix: platform-config
       defaultContext: flamingo
