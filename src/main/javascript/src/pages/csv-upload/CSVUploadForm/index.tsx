@@ -20,11 +20,15 @@ import {
   getPlayerListFromFiles,
   isBeforeToday,
 } from '~/utils/csv-upload';
+import {
+  getTimeZoneOffset,
+} from '~/utils/common';
 import config from '~/config';
 
 import ConfirmationModal from './ConfirmationModal';
 import styles from './CsvUploadForm.module.scss';
 
+const timeZoneOffset = getTimeZoneOffset();
 
 type FormData = {
   csvFiles: Array<UploadFile>;
@@ -79,7 +83,11 @@ const FORM_RULES = {
   ],
 };
 
-const CSVUploadForm: React.FC = () => {
+type CSVUploadFormProps = {
+  onUpdate(): void;
+};
+
+const CSVUploadForm: React.FC<CSVUploadFormProps> = ({ onUpdate }: CSVUploadFormProps) => {
   const [ confirmationModalOpen, setConfirmationModalOpen ] = useState<boolean>(false);
   const [ resultPopup, setResultPopup ] = useState<ResultPopupData | null>(null);
   const [ isLoading, setIsLoading ] = useState<boolean>(false);
@@ -127,6 +135,7 @@ const CSVUploadForm: React.FC = () => {
         setIsLoading(false);
         setResultPopup({ status: 'success' });
         form.resetFields();
+        onUpdate();
       })
       .catch((err: Error) => {
         setIsLoading(false);
@@ -200,7 +209,7 @@ const CSVUploadForm: React.FC = () => {
           <DatePicker
             className={styles.datePicker}
             format="YYYY-MM-DD HH:mm"
-            placeholder="Schedule date"
+            placeholder={`Schedule date (GMT${timeZoneOffset})`}
             showTime={{
               format: 'HH:mm',
               minuteStep: 5,
