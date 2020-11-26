@@ -23,7 +23,7 @@
         <kotlin.version>1.3.30</kotlin.version>
         <kotlin.code.style>official</kotlin.code.style>
         <bo-int.version>2.0.342</bo-int.version>
-        <optimove-int.version>RET-13768_show-campaign-progress-SNAPSHOT</optimove-int.version>
+        <optimove-int.version>3.0.10</optimove-int.version>
     </properties>
 
     <dependencies>

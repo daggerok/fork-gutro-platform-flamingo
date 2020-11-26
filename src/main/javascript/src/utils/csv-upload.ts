@@ -8,6 +8,7 @@ export interface ScheduledPlayer {
   playerUid: string;
   promotionUid: string;
   scheduled: string | null;
+  amount: string | null;
 }
 
 
@@ -43,6 +44,7 @@ const mergeFiles = (fileContents: Array<string>): Array<ScheduledPlayer> => {
 
       const playerIdIndex = headers.indexOf('playerId');
       const promotionIdIndex = headers.indexOf('promotionId');
+      const amountIndex = headers.indexOf('amount');
 
       if (playerIdIndex === -1) {
         throw 'CSV did not have a "playerId" header.';
@@ -56,11 +58,13 @@ const mergeFiles = (fileContents: Array<string>): Array<ScheduledPlayer> => {
           const playerRowParts = playerRow.split(',').map(it => it.trim());
           const playerUid = playerRowParts[playerIdIndex];
           const promotionUid = playerRowParts[promotionIdIndex];
+          const amount = amountIndex ? playerRowParts[amountIndex] : null;
         
           return {
             playerUid,
             promotionUid,
             scheduled: null,
+            amount,
           };
         }
       );

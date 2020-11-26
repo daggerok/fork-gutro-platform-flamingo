@@ -16,6 +16,7 @@ fun CampaignSchedulingRowJson.toDTO(): SchedulingPromotionDTO {
     playerUid?.let { builder.setPlayerUid(it) }
     promotionUid?.let { builder.setPromotionUid(it) }
     scheduled?.let { builder.setScheduled(it) }
+    amount?.let { builder.setAmount(it) }
 
     return builder.build()
 }

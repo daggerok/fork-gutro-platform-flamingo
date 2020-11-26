@@ -7,7 +7,8 @@ data class CampaignSchedulingCommandJson(
 data class CampaignSchedulingRowJson(
     val playerUid: String? = null,
     val promotionUid: String? = null,
-    val scheduled: String? = null
+    val scheduled: String? = null,
+    val amount: String? = null
 )
 
 data class CampaignSchedulingResponseJson(val error: String?)
