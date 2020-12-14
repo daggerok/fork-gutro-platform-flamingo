@@ -14,12 +14,13 @@ import tableColumns from './historytable-columns';
 
 type CampaignHistoryProps = {
   shouldUpdate: number | null;
+  showCampaignDetails: (id: string) => void;
 };
 
 type EventValue<DateType> = DateType | null;
 type RangeValue<DateType> = [EventValue<DateType>, EventValue<DateType>] | null;
 
-const CampaignHistory: React.FC<CampaignHistoryProps> = ({ shouldUpdate }: CampaignHistoryProps) => {
+const CampaignHistory: React.FC<CampaignHistoryProps> = ({ shouldUpdate, showCampaignDetails }: CampaignHistoryProps) => {
   const [ isLoading, setIsLoading ] = useState(true);
   const [ campaignHistory, setCampaignHistory ] = useState([]);
   const [ startEndDate, setStartEndDate ] = useState({ startDate: moment().startOf('week'), endDate: moment().endOf('week') });
@@ -91,7 +92,9 @@ const CampaignHistory: React.FC<CampaignHistoryProps> = ({ shouldUpdate }: Campa
         className={styles.table}
         dataSource={campaignHistory}
         rowKey="campaignId"
-        columns={tableColumns}
+        columns={tableColumns({
+          showCampaignDetails,
+        })}
         size="small"
         pagination={false}
         loading={isLoading}

@@ -1,5 +1,6 @@
 package com.gearsofleo.platform.flamingo.infrastructure.rest.campaignscheduling
 
+import com.gearsofleo.platform.aux.optimove.integration.api.PlatformAuxOptimoveIntegrationCommandApiProtos
 import com.gearsofleo.platform.flamingo.external.OptimoveIntClient
 import com.gearsofleo.platform.flamingo.infrastructure.rest.authentication.UserSessionJson
 import org.springframework.web.bind.annotation.PostMapping
@@ -29,6 +30,42 @@ class CampaignSchedulingResource(val optimoveIntClient: OptimoveIntClient) {
                 return CampaignSchedulingResponseJson("That exact combination of players and promotions have already been scheduled previously.\nPlease make sure your actions are intended.\n\nTo find out when it was scheduled last time please contact the Retention team in #plat-retention-public.")
             }
             CampaignSchedulingResponseJson(e.message)
+        }
+    }
+
+    @PostMapping("/abort-campaign")
+    fun abortCampaign(@RequestBody body: AbortCampaignJson, session: HttpSession): AbortResponse {
+        return try {
+            session.getAttribute(userSessionKey) as UserSessionJson?
+                ?: return AbortResponse("Not authenticated")
+
+            optimoveIntClient.abortCampaign(
+                PlatformAuxOptimoveIntegrationCommandApiProtos.AbortCampaignCommand.newBuilder()
+                    .setCampaignId(body.campaignId)
+                    .build()
+            )
+
+            AbortResponse(null)
+        } catch (e: Exception) {
+            AbortResponse(e.message ?: e.toString())
+        }
+    }
+
+    @PostMapping("/abort-customer-promotion")
+    fun abortCustomerPromotion(@RequestBody body: AbortCustomerPromotionJson, session: HttpSession): AbortResponse {
+        return try {
+            session.getAttribute(userSessionKey) as UserSessionJson?
+                ?: return AbortResponse("Not authenticated")
+
+            optimoveIntClient.abortCustomerPromotion(
+                PlatformAuxOptimoveIntegrationCommandApiProtos.AbortCustomerPromotionCommand.newBuilder()
+                    .setCustomerPromotionId(body.customerPromotionId)
+                    .build()
+            )
+
+            AbortResponse(null)
+        } catch (e: Exception) {
+            AbortResponse(e.message ?: e.toString())
         }
     }
 }

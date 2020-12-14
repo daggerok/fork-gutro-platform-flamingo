@@ -1,17 +1,33 @@
 import React from 'react';
 
 import { formatDateTimeWithWords, getTimeZoneOffset } from '~/utils/common';
+import config from '~/config';
 
 import styles from './CampaignHistory.module.scss';
 
-const antiloopUrl = `${location.origin}/antiloop`;
 const timeZoneOffset = getTimeZoneOffset();
 
-export default [
+type HistoryTableColumnsProps = {
+  showCampaignDetails: (id: string) => void;
+}
+
+type TableColumn = {
+  title: string;
+  dataIndex: string;
+  key: string;
+  render: (value: any) => JSX.Element; //eslint-disable-line @typescript-eslint/no-explicit-any
+}
+
+const HistoryTableColumns = ({ showCampaignDetails }: HistoryTableColumnsProps): TableColumn[] => [
   {
     title: 'Id',
     dataIndex: 'campaignId',
     key: 'campaignId',
+    render: function renderId (id: string): JSX.Element {
+      return (
+        <a onClick={(): void => { showCampaignDetails(id); }}>{ id }</a>
+      );
+    },
   },
 
   {
@@ -38,7 +54,7 @@ export default [
           { promotionIds.map<React.ReactNode>(promotionId => (
             <a
               key={promotionId}
-              href={`${antiloopUrl}/#/promotion/${promotionId}`}
+              href={`${config.antiloopUrl}/#/promotion/${promotionId}`}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -84,3 +100,5 @@ export default [
     },
   },
 ];
+
+export default HistoryTableColumns;

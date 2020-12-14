@@ -30,3 +30,11 @@ export const getTimeZoneOffset = (): string => {
   }
   return '';
 };
+
+export const roundToTwoDecimals = (number: number): number => {
+  return Math.round(number * 100) / 100;
+};
+
+export const allowAbort = (state: string): boolean => {
+  return !['COMPLETED', 'FAILED', 'ABORTED'].includes(state);
+};

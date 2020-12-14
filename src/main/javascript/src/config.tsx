@@ -1,5 +1,7 @@
 const common = {
   apiPath: '/flamingo/api',
+  antiloopUrl: `${location.origin}/antiloop`,
+  boUrl: `${location.origin}/bo`,
 };
 
 const prod = {

@@ -1,3 +1,14 @@
 .ant-result-subtitle {
     white-space: pre-line;
 }
+
+.ant-modal-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ant-modal {
+    position: unset;
+    top: unset;
+}

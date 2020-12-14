@@ -12,3 +12,16 @@ data class CampaignSchedulingRowJson(
 )
 
 data class CampaignSchedulingResponseJson(val error: String?)
+
+
+data class AbortCampaignJson(
+    val campaignId: String? = null
+)
+
+data class AbortCustomerPromotionJson(
+    val customerPromotionId: String? = null
+)
+
+data class AbortResponse(
+    val error: String? = null
+)

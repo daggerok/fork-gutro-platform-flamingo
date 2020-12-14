@@ -1,5 +1,8 @@
 package com.gearsofleo.platform.flamingo.infrastructure.rest.campaignschedulinghistory
 
+import com.gearsofleo.platform.aux.optimove.integration.api.PlatformAuxOptimoveIntegrationCommandApiProtos.AbortCampaignCommand
+import com.gearsofleo.platform.aux.optimove.integration.api.PlatformAuxOptimoveIntegrationCommandApiProtos.AbortCustomerPromotionCommand
+import com.gearsofleo.platform.aux.optimove.integration.api.PlatformAuxOptimoveIntegrationQueryApiProtos.GetScheduledCampaignDetailsQuery
 import com.gearsofleo.platform.aux.optimove.integration.api.PlatformAuxOptimoveIntegrationQueryApiProtos.GetScheduledCampaingsQuery
 import com.gearsofleo.platform.flamingo.external.OptimoveIntClient
 import com.gearsofleo.platform.flamingo.infrastructure.rest.authentication.UserSessionJson
@@ -32,6 +35,24 @@ class CampaignSchedulingHistoryResource(val optimoveIntClient: OptimoveIntClient
             response?.toJson()
         } catch (e: Exception) {
             ScheduledCampaignsResponseJson(e.message ?: e.toString())
+        }
+    }
+
+    @GetMapping("/details")
+    fun getScheduledCampaignDetails(@RequestParam campaignId: String, session: HttpSession): ScheduledCampaignDetailsResponseJson {
+        return try {
+            session.getAttribute(userSessionKey) as UserSessionJson?
+                ?: return ScheduledCampaignDetailsResponseJson("Not authenticated")
+
+            val response = optimoveIntClient.getCampaignDetails(
+                GetScheduledCampaignDetailsQuery.newBuilder()
+                    .setCampaignId(campaignId)
+                    .build()
+            )
+
+            response?.toJson()
+        } catch (e: Exception) {
+            ScheduledCampaignDetailsResponseJson(e.message ?: e.toString())
         }
     }
 }
