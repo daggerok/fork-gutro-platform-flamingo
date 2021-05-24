@@ -6,62 +6,33 @@ import {
   Typography,
 } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
-import axios from 'axios';
 
-import config from '~/config';
 import { allowAbort, formatDateTimeWithWords } from '~/utils/common';
+import { generateReportFromCampaign } from '~/utils/csv-download';
 import ConfirmationDialog from '~/components/ConfirmationDialog';
+import {
+  fetchSchedulingHistoryDetails,
+  abortCampaign,
+  abortCustomerPromotion,
+} from '~/api/scheduling';
 
+import {
+  CampaignDetailsProps,
+  CampaignDetails as CampaignDetailsType,
+  ConfirmAbortDetails,
+} from './types';
 import tableColumns from './customerpromotiontable-columns';
 import styles from './CampaignDetails.module.scss';
 
-
-type CampaignDetailsProps = {
-  campaignId: string | null;
-  handleClose: () => void;
-};
-
-type CampaignDetails = {
-  campaignId: string;
-  createDate: number;
-	state: string;
-	customerPromotions: Array<CustomerPromotionDetails>;
-}
-
-type CustomerPromotionDetails = {
-	customerPromotionId: string;
-	campaignId: string;
-	promotionId: string;
-	playerId: string;
-	state: string;
-	createDate: number;
-	updateDate: number;
-	scheduleDate: number;
-	brand: string;
-	currency: string;
-	amount: string;
-}
-
-type ConfirmAbortDetails = {
-  campaign: boolean;
-  customerPromotionId?: string;
-  playerId?: string;
-}
-
 const CampaignDetails: React.FC<CampaignDetailsProps> = ({ campaignId, handleClose }: CampaignDetailsProps) => {
-  const [ isLoading, setIsLoading ] = useState(true);
-  const [ campaignDetails, setCampaignDetails ] = useState<CampaignDetails | null>(null);
-  const [ confirmAbortDetails, setConfirmAbortDetails ] = useState<ConfirmAbortDetails | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [campaignDetails, setCampaignDetails] = useState<CampaignDetailsType | null>(null);
+  const [confirmAbortDetails, setConfirmAbortDetails] = useState<ConfirmAbortDetails | null>(null);
 
   const loadDetails = (): void => {
     setIsLoading(true);
 
-    axios.get(`${config.apiPath}/campaign-scheduling-history/details/`, {
-      params: {
-        campaignId,
-      },
-      timeout: 15000,
-    })
+    fetchSchedulingHistoryDetails(campaignId)
       .then((res) => {
         if (res.data.error) {
           throw new Error(res.data.error);
@@ -98,37 +69,33 @@ const CampaignDetails: React.FC<CampaignDetailsProps> = ({ campaignId, handleClo
     });
   };
 
-  const abortCampaign = async (): Promise<void> => {
+  const handleGenerateReport = (): void => {
+    generateReportFromCampaign(campaignId, campaignDetails);
+  };
+
+  const tryAbortCampaign = async (): Promise<void> => {
     setIsLoading(true);
     try {
-      await axios.post(
-        `${config.apiPath}/campaign-scheduling/abort-campaign/`,
-        { campaignId },
-        { timeout: 15000 }
-      );
-    } catch (e) {}
+      await abortCampaign(campaignId);
+    } catch (e) { }
 
     loadDetails();
   };
 
-  const abortCustomerPromotion = async (customerPromotionId: string): Promise<void> => {
+  const tryAbortCustomerPromotion = async (customerPromotionId: string): Promise<void> => {
     setIsLoading(true);
     try {
-      await axios.post(
-        `${config.apiPath}/campaign-scheduling/abort-customer-promotion/`,
-        { customerPromotionId },
-        { timeout: 15000 }
-      );
-    } catch (e) {}
+      await abortCustomerPromotion(customerPromotionId);
+    } catch (e) { }
 
     loadDetails();
   };
 
   const handleConfirmAbort = (): void => {
     if (confirmAbortDetails?.campaign) {
-      abortCampaign();
-    } else if(confirmAbortDetails?.customerPromotionId) {
-      abortCustomerPromotion(confirmAbortDetails.customerPromotionId);
+      tryAbortCampaign();
+    } else if (confirmAbortDetails?.customerPromotionId) {
+      tryAbortCustomerPromotion(confirmAbortDetails.customerPromotionId);
     }
     setConfirmAbortDetails(null);
   };
@@ -141,6 +108,9 @@ const CampaignDetails: React.FC<CampaignDetailsProps> = ({ campaignId, handleClo
 
   const showAbortButton = campaignDetails?.customerPromotions
     && campaignDetails.customerPromotions.some(customerPromotion => allowAbort(customerPromotion.state));
+
+  campaignDetails?.customerPromotions
+    .sort((a, b) => parseFloat(b.amount) - parseFloat(a.amount));
 
   return (
     <div
@@ -157,19 +127,32 @@ const CampaignDetails: React.FC<CampaignDetailsProps> = ({ campaignId, handleClo
       >
         <div className={styles.topContainer}>
           <Typography>
-            Campaign ID: { campaignId }<br />
-            Create date: { campaignDetails?.createDate && formatDateTimeWithWords(new Date(campaignDetails.createDate))}
+            Campaign ID: {campaignId}<br />
+            Create date: {campaignDetails?.createDate && formatDateTimeWithWords(new Date(campaignDetails.createDate))}<br />
           </Typography>
 
-          { showAbortButton && (
+          <div>
             <Button
-              danger
+              type="primary"
+              ghost
               size="large"
-              onClick={handleAbortCampaignClick}
+              onClick={handleGenerateReport}
+              className={styles.actionButton}
             >
-              Abort campaign
-            </Button>
-          )}
+              Generate Report
+          </Button>
+            {showAbortButton && (
+              <Button
+                danger
+                size="large"
+                onClick={handleAbortCampaignClick}
+                className={styles.actionButton}
+              >
+                Abort campaign
+              </Button>
+            )}
+
+          </div>
         </div>
 
         <Table

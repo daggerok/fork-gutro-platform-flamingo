@@ -10,7 +10,7 @@ import styles from './CsvUpload.module.scss';
 
 const CsvUpload: React.FC = () => {
   const [refreshHistory, setRefreshHistory] = useState<number | null>(null);
-  const [ showingDetailsForCampaignId, setShowingDetailsForCampaignId ] = useState<string | null>(null);
+  const [showingDetailsForCampaignId, setShowingDetailsForCampaignId] = useState<string | null>(null);
 
   const doRefreshHistory = useCallback(() => {
     setRefreshHistory(Number(new Date()));
@@ -20,13 +20,14 @@ const CsvUpload: React.FC = () => {
     setShowingDetailsForCampaignId(null);
     doRefreshHistory();
   };
-  
+
   return (
     <Layout>
       <main className={styles.main}>
         <div className={styles.form}>
           <CSVUploadForm onUpdate={doRefreshHistory} />
         </div>
+
         <div className={styles.history}>
           <CampaignHistory
             shouldUpdate={refreshHistory}
@@ -34,11 +35,11 @@ const CsvUpload: React.FC = () => {
           />
         </div>
 
-        { showingDetailsForCampaignId && (
-            <CampaignDetails
-              campaignId={showingDetailsForCampaignId}
-              handleClose={handleCampaignDetailsClose}
-            />
+        {showingDetailsForCampaignId && (
+          <CampaignDetails
+            campaignId={showingDetailsForCampaignId}
+            handleClose={handleCampaignDetailsClose}
+          />
         )}
       </main>
     </Layout>

@@ -1,18 +1,14 @@
 import React, { createContext, useState } from 'react';
 
-type AuthenticationContextProps = { 
-  authenticated: boolean | null;
-  setAuthenticated: (authenticated: boolean | null) => void;
-};
+import {
+  AuthenticationContextProps,
+  AuthenticationContextProviderProps,
+} from '~/components/Authentication/types';
 
 export const AuthenticationContext = createContext<AuthenticationContextProps>({
   authenticated: null,
-  setAuthenticated: () => {}, // eslint-disable-line @typescript-eslint/no-empty-function
+  setAuthenticated: () => { }, // eslint-disable-line @typescript-eslint/no-empty-function
 });
-
-type AuthenticationContextProviderProps = {
-  children: React.ReactNode;
-}
 
 const AuthenticationContextProvider: React.FC<AuthenticationContextProviderProps> = ({ children }: AuthenticationContextProviderProps) => {
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);

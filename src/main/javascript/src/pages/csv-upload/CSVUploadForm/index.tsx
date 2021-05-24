@@ -8,11 +8,8 @@ import {
   message,
 } from 'antd';
 import { UploadFile, UploadChangeParam, RcCustomRequestOptions } from 'antd/lib/upload/interface';
-import { Rule } from 'antd/lib/form';
 import { Store } from 'antd/lib/form/interface';
-import { ResultStatusType } from 'antd/lib/result';
 import { InboxOutlined } from '@ant-design/icons';
-import axios from 'axios';
 
 import ResultPopup from '~/components/ResultPopup';
 import {
@@ -23,36 +20,25 @@ import {
 import {
   getTimeZoneOffset,
 } from '~/utils/common';
-import config from '~/config';
+import {
+  schedulePromotions,
+} from '~/api/scheduling';
+
+import {
+  CSVUploadFormProps,
+  ResultPopupData,
+} from './types';
+
+import {
+  RESULT_POPUP_MESSAGES,
+  FORM_LAYOUT,
+  FORM_RULES,
+} from './constants';
 
 import ConfirmationModal from './ConfirmationModal';
 import styles from './CsvUploadForm.module.scss';
 
 const timeZoneOffset = getTimeZoneOffset();
-
-type FormData = {
-  csvFiles: Array<UploadFile>;
-  scheduleDate: Date;
-};
-
-type ResultPopupData = {
-  status: ResultStatusType;
-  message?: string;
-}
-
-const layout = {
-  labelCol: {
-    span: 6,
-  },
-  wrapperCol: {
-    span: 24,
-  },
-};
-
-const RESULT_POPUP_MESSAGES = {
-  success: 'Successfully scheduled promotions!',
-  error: 'Oops, something bad happened!',
-};
 
 const getResultPopupMessage = (key: string | number): string => {
   switch (key) {
@@ -63,28 +49,6 @@ const getResultPopupMessage = (key: string | number): string => {
     default:
       return '';
   }
-};
-
-const FORM_RULES = {
-  csvFiles: [
-    { required: true, message: 'Please upload at least one file' },
-    { validator: (rule: Rule, value: Array<UploadFile>): Promise<void> => {
-      const fileNames = value.map(it => it.name);
-      const uniqueFileNames = new Set(fileNames);
-
-      if (uniqueFileNames.size !== fileNames.length) {
-        return Promise.reject('You can\'t upload the same file multiple times.');
-      }
-      return Promise.resolve();
-    }},
-  ],
-  scheduleDate: [
-    { required: true, message: 'Please select a schedule date' },
-  ],
-};
-
-type CSVUploadFormProps = {
-  onUpdate(): void;
 };
 
 const CSVUploadForm: React.FC<CSVUploadFormProps> = ({ onUpdate }: CSVUploadFormProps) => {
@@ -122,11 +86,7 @@ const CSVUploadForm: React.FC<CSVUploadFormProps> = ({ onUpdate }: CSVUploadForm
     setConfirmationModalOpen(false);
     setIsLoading(true);
 
-    axios.post(`${config.apiPath}/campaign-scheduling/`, {
-      schedulingPromotions,
-    }, {
-      timeout: 60000,
-    })
+    schedulePromotions(schedulingPromotions)
       .then((res) => {
         if (res.data.error) {
           throw new Error(res.data.error);
@@ -169,10 +129,10 @@ const CSVUploadForm: React.FC<CSVUploadFormProps> = ({ onUpdate }: CSVUploadForm
         setOpen={setConfirmationModalOpen}
         schedulingPromotionCount={(schedulingPromotions || []).length}
         onOkClick={handleConfirmationModalOkClick}
-      ></ConfirmationModal>
+      />
 
       <Form
-        {...layout}
+        {...FORM_LAYOUT}
         form={form}
         initialValues={{
           remember: true,

@@ -20,6 +20,10 @@ export const formatDateTimeWithWords = (date: Date): string => {
   return `${datePart} ${timePart}`;
 };
 
+export const formatDateTimeWithWordsSeparator = (date: Date, separator: string): string => {
+  return formatDateTimeWithWords(date).replace(/\s/g, separator);
+};
+
 export const getTimeZoneOffset = (): string => {
   const hourOffset = new Date().getTimezoneOffset() / 60 * -1;
   if (hourOffset > 0) {

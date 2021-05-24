@@ -1,13 +1,7 @@
 import React from 'react';
 import { Modal, Result, Button } from 'antd';
-import { ResultStatusType } from 'antd/lib/result';
 
-type ResultPopupProps = {
-  onOkClick: (event: React.MouseEvent) => void;
-  title: string;
-  subTitle: string | undefined;
-  status: ResultStatusType;
-}
+import { ResultPopupProps } from './types';
 
 const ResultPopup: React.FC<ResultPopupProps> = ({
   onOkClick,

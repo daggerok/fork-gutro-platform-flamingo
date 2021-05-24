@@ -61,4 +61,5 @@ The frontend does not connect to any other service directly, it uses proxy endpo
 
 Every route has it's own folder in [/pages](/src/main/javascript/src/pages). Any component specific for that page should reside in that folder.\
 Components used in multiple pages should reside in [/components](/src/main/javascript/src/components). They should try to be simple and functionally pure.\
-When you feel your component is getting messy with too much logic, try to move code to a utils file. See [/utils](/src/main/javascript/src/utils). Create one file per `page`. Utils functions used in multiple pages should be put in [utils/common.js](/src/main/javascript/src/utils/common.js)
+When you feel your component is getting messy with too much logic, try to move code to a utils file. See [/utils](/src/main/javascript/src/utils). Create one file per `page`. Utils functions used in multiple pages should be put in [utils/common.js](/src/main/javascript/src/utils/common.js).
+Shared types or interfaces should be in [/types](/src/main/javascript/src/types/index.js).

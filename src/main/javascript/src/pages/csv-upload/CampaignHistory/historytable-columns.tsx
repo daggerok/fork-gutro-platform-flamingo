@@ -1,22 +1,13 @@
 import React from 'react';
 
-import { formatDateTimeWithWords, getTimeZoneOffset } from '~/utils/common';
 import config from '~/config';
+import { formatDateTimeWithWords, getTimeZoneOffset } from '~/utils/common';
+import { TableColumn } from '~/types';
 
+import { HistoryTableColumnsProps } from '././types';
 import styles from './CampaignHistory.module.scss';
 
 const timeZoneOffset = getTimeZoneOffset();
-
-type HistoryTableColumnsProps = {
-  showCampaignDetails: (id: string) => void;
-}
-
-type TableColumn = {
-  title: string;
-  dataIndex: string;
-  key: string;
-  render: (value: any) => JSX.Element; //eslint-disable-line @typescript-eslint/no-explicit-any
-}
 
 const HistoryTableColumns = ({ showCampaignDetails }: HistoryTableColumnsProps): TableColumn[] => [
   {

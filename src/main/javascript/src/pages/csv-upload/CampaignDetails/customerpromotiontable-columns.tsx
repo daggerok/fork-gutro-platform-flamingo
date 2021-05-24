@@ -2,21 +2,11 @@ import React from 'react';
 import { CloseCircleOutlined } from '@ant-design/icons';
 
 import config from '~/config';
-
-import styles from './CampaignDetails.module.scss';
 import { allowAbort, formatDateTimeWithWords, roundToTwoDecimals } from '~/utils/common';
+import { TableColumn } from '~/types';
 
-
-type CustomerPromotionTableColumnsProps = {
-  abortCustomerPromotion: (id: string) => void;
-}
-
-type TableColumn = {
-  title: string;
-  dataIndex?: string;
-  key: string;
-  render?: (value: any) => JSX.Element | null; //eslint-disable-line @typescript-eslint/no-explicit-any
-}
+import { CustomerPromotionTableColumnsProps } from '././types';
+import styles from './CampaignDetails.module.scss';
 
 const CustomerPromotionTableColumns = ({ abortCustomerPromotion }: CustomerPromotionTableColumnsProps): TableColumn[] => [
   {

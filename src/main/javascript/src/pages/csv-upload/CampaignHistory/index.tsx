@@ -4,21 +4,19 @@ import {
   Typography,
   DatePicker,
 } from 'antd';
-import axios from 'axios';
 import moment from 'moment';
 
-import config from '~/config';
+import {
+  fetchSchedulingHistory,
+} from '~/api/scheduling';
+
+import {
+  CampaignHistoryProps,
+  RangeValue,
+} from './types';
 
 import styles from './CampaignHistory.module.scss';
 import tableColumns from './historytable-columns';
-
-type CampaignHistoryProps = {
-  shouldUpdate: number | null;
-  showCampaignDetails: (id: string) => void;
-};
-
-type EventValue<DateType> = DateType | null;
-type RangeValue<DateType> = [EventValue<DateType>, EventValue<DateType>] | null;
 
 const CampaignHistory: React.FC<CampaignHistoryProps> = ({ shouldUpdate, showCampaignDetails }: CampaignHistoryProps) => {
   const [ isLoading, setIsLoading ] = useState(true);
@@ -30,13 +28,7 @@ const CampaignHistory: React.FC<CampaignHistoryProps> = ({ shouldUpdate, showCam
 
     const { startDate, endDate } = startEndDate;
 
-    axios.get(`${config.apiPath}/campaign-scheduling-history/`, {
-      params: {
-        startDate: startDate.valueOf(),
-        endDate: endDate.valueOf(),
-      },
-      timeout: 15000,
-    })
+    fetchSchedulingHistory(startDate, endDate)
       .then((res) => {
         if (res.data.error) {
           throw new Error(res.data.error);

@@ -34,6 +34,10 @@
 }
 
 .table {
-  max-height: 60vh;
+  max-height: 100vh;
   overflow-y: scroll;
+}
+
+.actionButton {
+  margin-left: 16px;
 }

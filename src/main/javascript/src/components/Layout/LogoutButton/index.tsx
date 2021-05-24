@@ -1,16 +1,15 @@
 import React, { useContext } from 'react';
-import axios from 'axios';
 import { Menu } from 'antd';
 
 import { AuthenticationContext } from '~/components/Authentication/AuthenticationContextProvider';
-import config from '~/config';
+import { logoutPlayer } from '~/api/auth';
 
 const LogoutButton: React.FC = () => {
   const { setAuthenticated } = useContext(AuthenticationContext);
 
   const handleLogoutClick = (): void => {
     setAuthenticated(false);
-    axios.delete(`${config.apiPath}/authentication/`, { withCredentials: true }); // We don't really care if it works or not
+    logoutPlayer();
   };
 
   return (

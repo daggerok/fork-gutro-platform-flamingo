@@ -1,22 +1,9 @@
-import React from 'react';
-
-import config from './config';
 
 import Login from '~/pages/login';
 import CsvUpload from '~/pages/csv-upload';
+import { RouteList } from '~/types';
 
-export interface Route {
-  title: string;
-  path: string;
-  icon?: React.ComponentClass | React.FunctionComponent;
-  component: React.ComponentClass | React.FunctionComponent;
-  subRoutes?: Array<Route>;
-}
-
-export interface RouteList {
-  login: Route;
-  csvUpload: Route;
-}
+import config from './config';
 
 export const routes: RouteList = {
 
@@ -31,5 +18,4 @@ export const routes: RouteList = {
     path: `${config.rootPath}/csv-upload`,
     component: CsvUpload,
   },
-
 };

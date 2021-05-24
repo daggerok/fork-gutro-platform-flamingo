@@ -1,13 +1,7 @@
 import React from 'react';
-
 import { Modal } from 'antd';
 
-type ConfirmationModalProps = {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  schedulingPromotionCount: number;
-  onOkClick: () => void;
-}
+import { ConfirmationModalProps } from '../types';
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   open,

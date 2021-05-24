@@ -1,12 +1,7 @@
 import React from 'react';
 import { Modal, Result, Button } from 'antd';
 
-type ConfirmationDialogProps = {
-  onOkClick: (event: React.MouseEvent) => void;
-  onCancelClick: (event: React.MouseEvent) => void;
-  title: string;
-  subTitle: string | undefined;
-}
+import { ConfirmationDialogProps } from './types';
 
 const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   onOkClick,

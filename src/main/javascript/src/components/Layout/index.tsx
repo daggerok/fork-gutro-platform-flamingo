@@ -6,13 +6,9 @@ import Header from './Header';
 import Menu from './Menu';
 import { AuthenticationContext } from '~/components/Authentication/AuthenticationContextProvider';
 
-
-import styles from './Layout.module.scss';
+import { LayoutProps } from './types';
 import LogoutButton from './LogoutButton';
-
-type LayoutProps = {
-  children: React.ReactNode;
-}
+import styles from './Layout.module.scss';
 
 const Layout: React.FC<LayoutProps> = ({ children }: LayoutProps) => {
   const { authenticated } = useContext(AuthenticationContext);

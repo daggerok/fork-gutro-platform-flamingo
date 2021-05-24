@@ -2,12 +2,11 @@ import React from 'react';
 import { Button } from 'antd';
 
 import Layout from '~/components/Layout';
+import {
+  FullpageErrorProps,
+} from '~/components/Authentication/types';
 
 import styles from './FullpageError.module.scss';
-
-type FullpageErrorProps = {
-  error: string;
-};
 
 const FullpageError: React.FC<FullpageErrorProps> = ({ error }: FullpageErrorProps) => {
   const handleTryAgainClick = (): void => {

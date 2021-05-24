@@ -2,55 +2,32 @@ import React, { useState, useContext } from 'react';
 import { Spin, Form, Input, Button, Typography } from 'antd';
 const { Text } = Typography;
 import { Store } from 'antd/lib/form/interface';
-import axios from 'axios';
 import idx from 'idx';
 
-import { AuthenticationContext } from '~/components/Authentication/AuthenticationContextProvider';
-import config from '~/config';
+import {
+  AuthenticationContext,
+} from '~/components/Authentication/AuthenticationContextProvider';
+import {
+  loginPlayer,
+} from '~/api/auth';
+import {
+  LAYOUT,
+  TAIL_LAYOUT,
+  FORM_RULES,
+} from './constants';
 
 import styles from './LoginForm.module.scss';
 
-type FormData = {
-  username: string;
-  password: string;
-};
-
-const layout = {
-  labelCol: {
-    span: 8,
-  },
-  wrapperCol: {
-    span: 16,
-  },
-};
-const tailLayout = {
-  wrapperCol: {
-    offset: 8,
-    span: 16,
-  },
-};
-
-const FORM_RULES = {
-  username: [
-    { required: true, message: 'Please input your username' },
-  ],
-  password: [
-    { required: true, message: 'Please input your password' },
-  ],
-};
-
 const LoginForm: React.FC = () => {
-  const [ isLoading, setIsLoading ] = useState<boolean>(false);
-  const [ loginError, setLoginError ] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
+
   const { setAuthenticated } = useContext(AuthenticationContext);
 
   const onFinish = (values: Store): void => {
     setIsLoading(true);
-    
-    axios.post(`${config.apiPath}/authentication/`, {
-      username: values.username,
-      password: values.password,
-    }, { timeout: 10000, withCredentials: true })
+
+    loginPlayer(values.username, values.password)
       .then((response) => {
         const user = idx(response, _ => _.data.user);
         if (user) {
@@ -71,7 +48,7 @@ const LoginForm: React.FC = () => {
   return (
     <Spin spinning={isLoading}>
       <Form
-        {...layout}
+        {...LAYOUT}
         name="basic"
         initialValues={{
           remember: true,
@@ -94,7 +71,7 @@ const LoginForm: React.FC = () => {
           <Input.Password />
         </Form.Item>
 
-        <Form.Item {...tailLayout}>
+        <Form.Item {...TAIL_LAYOUT}>
           <Button
             type="primary"
             htmlType="submit"
@@ -103,10 +80,10 @@ const LoginForm: React.FC = () => {
           </Button>
         </Form.Item>
 
-        { loginError && (
+        {loginError && (
           <Form.Item className={styles.errorMessage}>
             <Text type="danger">
-              { loginError }
+              {loginError}
             </Text>
           </Form.Item>
         )}
