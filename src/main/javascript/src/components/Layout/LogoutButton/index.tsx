@@ -21,7 +21,7 @@ const LogoutButton: React.FC = () => {
         key="logout-button"
         onClick={handleLogoutClick}
       >
-        Logout
+        Log Out
       </Menu.Item>
     </Menu>
   );

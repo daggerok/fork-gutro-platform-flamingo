@@ -26,3 +26,4 @@ export interface ApiResult {
 interface ApiError {
     message: string;
 }
+

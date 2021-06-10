@@ -13,6 +13,8 @@
     "@ant-design/icons": "^4.3.0",
     "antd": "^4.3.4",
     "axios": "^0.19.2",
+    "classnames": "^2.3.1",
+    "flag-icon-css": "^3.5.0",
     "idx": "^2.5.6",
     "moment": "^2.29.1",
     "node-sass": "^4.14.1",

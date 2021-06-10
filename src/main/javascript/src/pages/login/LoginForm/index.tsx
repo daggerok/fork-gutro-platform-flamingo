@@ -4,17 +4,9 @@ const { Text } = Typography;
 import { Store } from 'antd/lib/form/interface';
 import idx from 'idx';
 
-import {
-  AuthenticationContext,
-} from '~/components/Authentication/AuthenticationContextProvider';
-import {
-  loginPlayer,
-} from '~/api/auth';
-import {
-  LAYOUT,
-  TAIL_LAYOUT,
-  FORM_RULES,
-} from './constants';
+import { AuthenticationContext } from '~/components/Authentication/AuthenticationContextProvider';
+import { loginPlayer } from '~/api/auth';
+import { LAYOUT, TAIL_LAYOUT, FORM_RULES } from './constants';
 
 import styles from './LoginForm.module.scss';
 
@@ -82,9 +74,7 @@ const LoginForm: React.FC = () => {
 
         {loginError && (
           <Form.Item className={styles.errorMessage}>
-            <Text type="danger">
-              {loginError}
-            </Text>
+            <Text type="danger">{loginError}</Text>
           </Form.Item>
         )}
       </Form>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import idx from 'idx';
-// import Link from 'next/link';
 
 import { Menu as AntdMenu } from 'antd';
 
@@ -39,11 +38,7 @@ const Menu: React.FC = () => {
       selectedKeys={[selectedKey || '']}
     >
       { menuItems.map(menuItem => (
-        <AntdMenu.Item key={menuItem.url}>
-          {/* <Link href={menuItem.url}>
-            <a>{ menuItem.title }</a>
-          </Link>   */}
-        </AntdMenu.Item>
+        <AntdMenu.Item key={menuItem.url} />
       ))}
     </AntdMenu>
   );

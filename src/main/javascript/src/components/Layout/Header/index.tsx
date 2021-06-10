@@ -1,7 +1,7 @@
 import React from 'react';
 import { Layout } from 'antd';
 const { Header: AntdHeader } = Layout;
-
+import EnvironmentFlag from '~/components/Common/EnvironmentFlag';
 import { HeaderProps } from '../types';
 
 import styles from './Header.module.scss';
@@ -14,6 +14,9 @@ const Header: React.FC<HeaderProps> = ({ children }: HeaderProps) => (
       className={styles.logo}
     />
     <span className={styles.title}>Flamingo</span>
+    <div className={styles.flagContainer}>
+      <EnvironmentFlag />
+    </div>
     { children }
   </AntdHeader>
 );
