@@ -14,9 +14,9 @@ This is a Hyraco service serving a React app.
 
 The backend application will both serve any static files put in the `resources/static` folder as well as route API requests to correct service.
 
-To run the backend, either open IntelliJ and go to `Application.kt` and click start, or open a terminal and run:
+To run the backend, either open IntelliJ and go to `Application.kt` and click start, or open a terminal to build frontend into `src/main/resources/static` folder and run application using oneliner maven command from project root:
 ```bash
-/platform-flamingo > $ mvn clean compile exec:java
+/platform-flamingo > $ mvn clean spring-boot:run
 ```
 
 The backend is hosted locally on [http://localhost:8080/flamingo](http://localhost:8080/flamingo)
@@ -37,13 +37,12 @@ Login with your regular BO credentials.
 
 To trigger a production build:
 ```bash
-/platform-flamingo/src/main/javascript > $ yarn build
-/platform-flamingo > $ mvn clean compile
+/platform-flamingo > $ mvn clean package
 ```
 
 To run the production build locally, just do:
 ```bash
-/platform-flamingo > $ mvn exec:java
+/platform-flamingo > $ mvn spring-boot:run
 ```
 
 ---
