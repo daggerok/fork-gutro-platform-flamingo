@@ -30,15 +30,14 @@ pipeline {
     // <leo-ci:env>
     LEOCI_MAVEN_USER      = credentials('nexus-user')
     LEOCI_MAVEN_PASSWORD  = credentials('nexus-password')
-    GITHUB_USER           = credentials('github-rhino-user')
-    GITHUB_PASSWORD       = credentials('github-rhino-password')
+    GITHUB_CREDENTIALS    = credentials('github-ee-delivery')
     GCR_REPO              = 'eu.gcr.io/leo-platform-infra/artifacts'
     GIT_COMMIT_SHORT      = "${GIT_COMMIT[0..6]}"
     SNAPSHOT_VERSION      = "${CHANGE_BRANCH ?: BRANCH_NAME}-SNAPSHOT".replace('/', '-')
     PROJECT_NAME          = GIT_URL.split('/').last().minus('.git')
     GITHUB_URL            = GIT_URL.replace( //Add username and password to git url to make writable github url
         'https://',
-        "https://${GITHUB_USER}:${GITHUB_PASSWORD}@"
+        "https://${GITHUB_CREDENTIALS}@"
     )
     // </leo-ci:env>
     LEOCI_NPM_TOKEN = credentials('npm-token')
@@ -103,7 +102,7 @@ pipeline {
     // <leo-ci:stage-verify>
     stage('Test and Package') {
       parallel {
-        stage('MySQL 5') {
+        stage('MySQL Current') {
           steps {
             container('maven') {
               sh(script: 'mvn source:jar verify', label: 'Maven Verify')
@@ -124,7 +123,7 @@ pipeline {
             return sh(script: 'grep -rq -m1 --include="*.xml" "<databaseChangeLog" .', returnStatus: true) == 0
           }}
           stages {
-            stage('MySQL 8') {
+            stage('MySQL Next') {
               agent {
                 kubernetes {
                   label "build-java-service-mysql8-${UUID.randomUUID().toString()}"

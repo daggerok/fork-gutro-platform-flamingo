@@ -40,10 +40,10 @@ spec:
       tty: true
       resources:
         requests:
-          cpu: 2
+          cpu: 2000m
           memory: 2Gi
         limits:
-          cpu: 4
+          cpu: 4000m
           memory: 4Gi
 
     - name: docker
@@ -65,7 +65,7 @@ spec:
     # </leo-ci:containers>
     # <leo-ci:containers-mysql>
     - name: mysql
-      image: mysql:5.7.29
+      image: mysql:8.0.19
       env:
         - { name: MYSQL_ROOT_PASSWORD,  value: 'xxxx'       }
         - { name: MYSQL_DATABASE,       value: 'leoci'      }
@@ -74,7 +74,7 @@ spec:
     # </leo-ci:containers-mysql>
     # <leo-ci:containers-rabbitmq>
     - name: rabbitmq
-      image: rabbitmq:3
+      image: rabbitmq:3.8-alpine
       env:
         - { name: RABBITMQ_DEFAULT_VHOST, value: 'platform' }
         - { name: RABBITMQ_DEFAULT_USER,  value: 'platform_service' }
