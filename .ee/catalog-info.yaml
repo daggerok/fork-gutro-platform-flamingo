@@ -1,0 +1,36 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: flamingo
+  description: |
+    Service handles requests from frontend and proxies them to the responsible services
+  annotations:
+    github.com/project-slug: gutro/platform-flamingo
+    jenkins.io/github-folder: Builds/platform-flamingo
+    leovegas.com/component-id: flamingo
+    leovegas.com/docker-image: eu.gcr.io/leo-platform-infra/artifacts/com.gearsofleo.platform/platform-flamingo
+    leovegas.com/maven-coordinate: com.gearsofleo.platform/platform-flamingo
+  tags:
+  - java
+  - kotlin
+  - maven
+  - hyraco
+  - spring
+spec:
+  type: service
+  lifecycle: experimental
+  owner: group:Retention
+  dependsOn: ["changemanagement:chm-flamingo"]
+---
+apiVersion: com.gearsofleo.platform/v1alpha1
+kind: ChangeManagement
+metadata:
+  name: chm-flamingo
+  confidentiality: 1
+  integrity: 1
+  availability: 1
+  accountability: 1
+  regulatory-critical:
+    include: []
+  scoped-to-license:
+    exclude: []

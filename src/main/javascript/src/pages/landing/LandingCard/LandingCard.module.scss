@@ -1,0 +1,48 @@
+.landingCard {
+  position: relative;
+  width: 500px;
+  max-width: 100%;
+}
+
+.textWrapper {
+  line-height: 150px;
+  height: 150px;
+  text-align: center;
+}
+
+.landingCardHeader {
+  text-transform: uppercase;
+  display: inline-block;
+  line-height: 1.5;
+  vertical-align: middle;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  height: 100%;
+  opacity: 0;
+  transition: .4s ease;
+  background: linear-gradient(0deg, rgba(252,142,172,1) 0%, rgb(255, 155, 110) 100%);
+  color: #001529; 
+  font-size: 1.3em;
+}
+
+.landingCard:hover .overlay {
+  opacity: 1;
+}
+
+.landingCardDescription {
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+

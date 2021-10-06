@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -12,47 +13,43 @@
 
     <parent>
         <groupId>com.gearsofleo.hyraco</groupId>
-        <artifactId>hyraco-starter-parent</artifactId>
-        <version>1.0.30</version>
+        <artifactId>hyraco-starter-kotlin-parent</artifactId>
+        <version>1.0.44</version>
     </parent>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <kotlin.version>1.3.30</kotlin.version>
-        <kotlin.code.style>official</kotlin.code.style>
-        <bo-int.version>2.0.342</bo-int.version>
-        <optimove-int.version>3.0.11</optimove-int.version>
-        <frontend-maven-plugin.nodeVersion>14.17.3</frontend-maven-plugin.nodeVersion>
-        <frontend-maven-plugin.yarnVersion>1.22.10</frontend-maven-plugin.yarnVersion>
-        <frontend-maven-plugin.version>1.12.0</frontend-maven-plugin.version>
+        <skipYarn>false</skipYarn>
         <skipYarnInstall>false</skipYarnInstall>
+        <kotlin.code.style>official</kotlin.code.style>
+        <skipDocumentationBuild>true</skipDocumentationBuild>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <asciidoctor.outputs>${project.build.directory}/docs</asciidoctor.outputs>
+        <!---->
+        <spring-restdocs-asciidoctor.version>2.0.5.RELEASE</spring-restdocs-asciidoctor.version>
+        <rest-assured-kotlin-extensions.version>4.2.0</rest-assured-kotlin-extensions.version>
+        <frontend-maven-plugin.yarnVersion>1.22.11</frontend-maven-plugin.yarnVersion>
+        <frontend-maven-plugin.nodeVersion>12.22.6</frontend-maven-plugin.nodeVersion>
+        <frontend-maven-plugin.npmVersion>7.21.0</frontend-maven-plugin.npmVersion>
+        <asciidoctor-maven-plugin.version>2.1.0</asciidoctor-maven-plugin.version>
+        <frontend-maven-plugin.version>1.12.0</frontend-maven-plugin.version>
+        <asciidoctorj-diagram.version>2.1.2</asciidoctorj-diagram.version>
+        <log4j-api-kotlin.version>1.0.0</log4j-api-kotlin.version>
+        <asciidoctorj-pdf.version>1.6.0</asciidoctorj-pdf.version>
+        <jruby-complete.version>9.2.18.0</jruby-complete.version>
+        <rest-assured.version>4.2.0</rest-assured.version>
+        <springmockk.version>3.0.1</springmockk.version>
+        <mockk.version>1.12.0</mockk.version>
+        <!---->
+        <bo-feign-client.version>2.0.462</bo-feign-client.version>
+        <country-feign-client.version>3.0.36</country-feign-client.version>
+        <optimove-feign-client.version>3.0.13</optimove-feign-client.version>
+        <affiliate-feign-client.version>1.0.1</affiliate-feign-client.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib</artifactId>
-            <version>${kotlin.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-reflect</artifactId>
-            <version>${kotlin.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-test-junit</artifactId>
-            <version>${kotlin.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Starters --><dependency>
             <groupId>com.gearsofleo.hyraco</groupId>
             <artifactId>hyraco-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.gearsofleo.hyraco</groupId>
-            <artifactId>hyraco-discovery</artifactId>
         </dependency>
         <dependency>
             <groupId>com.gearsofleo.hyraco</groupId>
@@ -60,88 +57,138 @@
         </dependency>
         <dependency>
             <groupId>com.gearsofleo.hyraco</groupId>
-            <artifactId>hyraco-logging</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.gearsofleo.hyraco</groupId>
             <artifactId>hyraco-support-hashing</artifactId>
         </dependency>
+        <!---->
+        <dependency>
+            <groupId>com.gearsofleo.hyraco</groupId>
+            <artifactId>hyraco-support-feign-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.gearsofleo.platform</groupId>
+            <artifactId>platform-integration-bo-api-feign-client</artifactId>
+            <version>${bo-feign-client.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>*</artifactId>
+                    <groupId>com.gearsofleo.rhino</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.gearsofleo.platform</groupId>
+            <artifactId>platform-aux-optimove-integration-api-feign-client</artifactId>
+            <version>${optimove-feign-client.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>*</artifactId>
+                    <groupId>com.gearsofleo.rhino</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.gearsofleo.platform</groupId>
+            <artifactId>platform-aux-affiliate-api-feign-client</artifactId>
+            <version>${affiliate-feign-client.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>*</artifactId>
+                    <groupId>com.gearsofleo.rhino</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.gearsofleo.platform</groupId>
+            <artifactId>platform-aux-country-api-feign-client</artifactId>
+            <version>${country-feign-client.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>*</artifactId>
+                    <groupId>com.gearsofleo.rhino</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!---->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api-kotlin</artifactId>
+            <version>${log4j-api-kotlin.version}</version>
+        </dependency>
+        <!---->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-openfeign</artifactId>
+            <artifactId>spring-cloud-contract-wiremock</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.gearsofleo.platform</groupId>
-            <artifactId>platform-integration-bo-api-api</artifactId>
-            <version>${bo-int.version}</version>
+            <groupId>org.springframework.restdocs</groupId>
+            <artifactId>spring-restdocs-restassured</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.gearsofleo.platform</groupId>
-            <artifactId>platform-aux-optimove-integration-api-api</artifactId>
-            <version>${optimove-int.version}</version>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>kotlin-extensions</artifactId>
+            <version>${rest-assured-kotlin-extensions.version}</version>
+            <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <build>
+        <defaultGoal>verify</defaultGoal>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>
 
         <plugins>
-
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
 
             <plugin>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-maven-plugin</artifactId>
-                <version>${kotlin.version}</version>
-                <executions>
-                    <execution>
-                        <id>compile</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>test-compile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>test-compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <jvmTarget>1.8</jvmTarget>
-                    <compilerPlugins>
-                        <plugin>spring</plugin>
-                        <plugin>jpa</plugin>
-                        <plugin>no-arg</plugin>
-                    </compilerPlugins>
-                    <pluginOptions>
-                        <option>no-arg:annotation=javax.persistence.Embeddable</option>
-                    </pluginOptions>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.jetbrains.kotlin</groupId>
-                        <artifactId>kotlin-maven-allopen</artifactId>
-                        <version>${kotlin.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.jetbrains.kotlin</groupId>
-                        <artifactId>kotlin-maven-noarg</artifactId>
-                        <version>${kotlin.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-
-            <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
+                <version>${frontend-maven-plugin.version}</version>
+                <configuration>
+                    <skip>${skipYarn}</skip>
+                    <installDirectory>target</installDirectory>
+                    <workingDirectory>src/main/javascript</workingDirectory>
+                    <npmVersion>v${frontend-maven-plugin.npmVersion}</npmVersion>
+                    <nodeVersion>v${frontend-maven-plugin.nodeVersion}</nodeVersion>
+                    <yarnVersion>v${frontend-maven-plugin.yarnVersion}</yarnVersion>
+                    <npmRegistryURL>
+                        https://delivery-nexus.leo-platform-infra.lvg-tech.net/repository/npm/
+                    </npmRegistryURL>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>install node and yarn</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>install-node-and-yarn</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>run yarn install command</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>install</arguments>
+                            <skip>${skipYarnInstall}</skip>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>run yarn build command</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>build</arguments>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
@@ -151,7 +198,7 @@
                 <executions>
                     <execution>
                         <id>enforce-frontend-build-exist</id>
-                        <phase>compile</phase>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>enforce</goal>
                         </goals>
@@ -175,7 +222,7 @@
                 <executions>
                     <execution>
                         <id>copy-frontend-resources</id>
-                        <phase>compile</phase>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
@@ -192,53 +239,100 @@
                     </execution>
                 </executions>
             </plugin>
-        </plugins>
 
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>com.github.eirslett</groupId>
-                    <artifactId>frontend-maven-plugin</artifactId>
-                    <version>${frontend-maven-plugin.version}</version>
-                    <configuration>
-                        <installDirectory>target</installDirectory>
-                        <workingDirectory>src/main/javascript</workingDirectory>
-                        <nodeVersion>v${frontend-maven-plugin.nodeVersion}</nodeVersion>
-                        <yarnVersion>v${frontend-maven-plugin.yarnVersion}</yarnVersion>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>install node and yarn</id>
-                            <phase>process-resources</phase>
-                            <goals>
-                                <goal>install-node-and-yarn</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>run yarn install command</id>
-                            <phase>process-resources</phase>
-                            <goals>
-                                <goal>yarn</goal>
-                            </goals>
-                            <configuration>
-                                <arguments>install</arguments>
-                                <skip>${skipYarnInstall}</skip>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>run yarn build command</id>
-                            <phase>process-resources</phase>
-                            <goals>
-                                <goal>yarn</goal>
-                            </goals>
-                            <configuration>
-                                <arguments>build</arguments>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-        </pluginManagement>
+            <plugin>
+                <groupId>org.asciidoctor</groupId>
+                <artifactId>asciidoctor-maven-plugin</artifactId>
+                <version>${asciidoctor-maven-plugin.version}</version>
+                <configuration>
+                    <skip>${skipDocumentationBuild}</skip>
+                    <outputDirectory>${asciidoctor.outputs}</outputDirectory>
+                    <sourceDirectory>${project.basedir}/src/main/docs</sourceDirectory>
+                    <doctype>docbook</doctype>
+                    <sourceDocumentName>index.adoc</sourceDocumentName>
+                    <attributes>
+                        <project-version>${project.version}</project-version>
+                        <project-group-id>${project.groupId}</project-group-id>
+                        <project-artifact-id>${project.artifactId}</project-artifact-id>
+                        <source-highlighter>rouge</source-highlighter>
+                        <snippets>${project.build.directory}/generated-snippets</snippets>
+                        <attribute-undefined>drop-line</attribute-undefined>
+                        <attribute-missing>warn</attribute-missing>
+                        <sectanchors>true</sectanchors>
+                        <idseparator>-</idseparator>
+                        <icons>font</icons>
+                        <allow-uri-read/>
+                        <toc>false</toc>
+                        <data-uri/>
+                        <idprefix/>
+                        <pagenums/>
+                    </attributes>
+                    <requires>
+                        <require>asciidoctor-diagram</require>
+                    </requires>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>generate HTML documentation</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>process-asciidoc</goal>
+                        </goals>
+                        <configuration>
+                            <backend>html5</backend>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate PDF documentation</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>process-asciidoc</goal>
+                        </goals>
+                        <configuration>
+                            <backend>pdf</backend>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.springframework.restdocs</groupId>
+                        <artifactId>spring-restdocs-asciidoctor</artifactId>
+                        <version>${spring-restdocs-asciidoctor.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.asciidoctor</groupId>
+                        <artifactId>asciidoctorj-pdf</artifactId>
+                        <version>${asciidoctorj-pdf.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.asciidoctor</groupId>
+                        <artifactId>asciidoctorj-diagram</artifactId>
+                        <version>${asciidoctorj-diagram.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.jruby</groupId>
+                        <artifactId>jruby-complete</artifactId>
+                        <version>${jruby-complete.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>build-docs</id>
+            <properties>
+                <skipDocumentationBuild>false</skipDocumentationBuild>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>include-docs</id>
+            <properties>
+                <asciidoctor.outputs>${project.build.outputDirectory}/static/docs</asciidoctor.outputs>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>

@@ -21,7 +21,7 @@ const formatArrayIntoCsv = (arrayData: any[]): string => {
     .map(numberConverter)
     .join(SEPARATOR);
 
-  const rowKeysToCsv = (row: {}) => arrayToCsv(Object.keys(row));
+  const rowKeysToCsv = (row: Record<string, unknown>) => arrayToCsv(Object.keys(row));
   const rowToCsv = (row: { [s: string]: unknown } | ArrayLike<unknown>): string => arrayToCsv(Object.values(row));
   const rowsToCsv = (arr: any[]): string => arr.map((row: any) => rowToCsv(row)).join('\n');
 

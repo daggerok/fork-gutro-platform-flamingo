@@ -1,30 +1,41 @@
 package com.gearsofleo.platform.flamingo.infrastructure.rest.authentication
 
-import com.gearsofleo.platform.flamingo.external.BoIntClient
 import com.gearsofleo.platform.integration.bo.api.PlatformIntegrationBoApiProtos.BoSessionContextDTO
 import com.gearsofleo.platform.integration.bo.api.PlatformIntegrationBoUserCommandApiProtos.UpdateBoSessionCommand
+import com.gearsofleo.platform.integration.bo.client.feign.BoUserCommandClient
+import javax.servlet.http.HttpSession
+import org.apache.logging.log4j.kotlin.logger
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.DeleteMapping
-import javax.servlet.http.HttpSession
 
 @RestController
 @RequestMapping("/api/authentication")
-class AuthenticationResource(val boIntClient: BoIntClient) {
+class AuthenticationResource(
+    private val authProps: AuthProps,
+    private val boIntClient: BoUserCommandClient,
+) {
 
-    private final val userSessionKey = "USER_SESSION"
+    /* // TODO: FIXME: More appropriate way to handle authentication, but may require fronted
+            updates of handling http response statuses codes for some cases: 200 OK -> 401 Unauthorized
+    @ExceptionHandler(Throwable::class)
+    fun handleError(e: Throwable): ResponseEntity<AuthenticationStatusJson> =
+        ResponseEntity.status(UNAUTHORIZED)
+            .body(AuthenticationStatusJson(false, error = e.message ?: "Unknown reason"))
+            .apply { log.warn { e } }
+    */
 
     @GetMapping("/")
-    fun getAuthenticationStatus(session: HttpSession): AuthenticationStatusJson {
-        return try {
-            val userSession = session.getAttribute(userSessionKey) as UserSessionJson? ?: return AuthenticationStatusJson(
-                false,
-                null,
-                null
-            )
+    fun getAuthenticationStatus(session: HttpSession): AuthenticationStatusJson =
+        runCatching {
+
+            val userSession =
+                session.getAttribute(userSessionKey) as UserSessionJson?
+                    ?: return AuthenticationStatusJson(false)
+                        .apply { log.warn { "use session is null $this" } }
 
             boIntClient.updateSession(
                 UpdateBoSessionCommand
@@ -38,48 +49,58 @@ class AuthenticationResource(val boIntClient: BoIntClient) {
                     .build()
             )
 
-            AuthenticationStatusJson(true, userSession.user, null)
-        } catch (e: Exception) {
-            AuthenticationStatusJson(false, null, e.message)
+            AuthenticationStatusJson(true, userSession.user)
+
+        }.getOrElse {
+            AuthenticationStatusJson(false, error = it.message)
+                .apply { log.warn { "get auth status: $it" } }
         }
-    }
 
     @PostMapping("/")
-    fun startSession(@RequestBody login: UserLoginJson, session: HttpSession): AuthenticationStatusJson {
-        return try {
+    fun startSession(@RequestBody login: UserLoginJson, session: HttpSession): AuthenticationStatusJson =
+        runCatching {
 
             val newSession = boIntClient.startSession(login.toBoStartSessionCommand())
 
             if (newSession.hasUser()) {
-                if (!newSession.user.rolesList.contains("BONUS_WRITE")) {
-                    return AuthenticationStatusJson(false, null, "User needs role BONUS_WRITE to login")
+
+                val userMissingRequiredRole = newSession.user.rolesList.none { authProps.rolesToCheck.contains(it) }
+                if (userMissingRequiredRole) {
+                    val error = "User needs role ${authProps.rolesToCheck.joinToString { " or " }} to login"
+                    return AuthenticationStatusJson(false, error = error)
+                        .apply { log.warn { error } }
                 }
 
                 session.setAttribute(userSessionKey, newSession.toUserSessionJson())
-
-                return AuthenticationStatusJson(true, newSession.user.toJson(), null)
+                return AuthenticationStatusJson(true, newSession.user.toJson())
             }
 
-            AuthenticationStatusJson(false, null, "Could not create user session")
-        } catch (e: Exception) {
-            AuthenticationStatusJson(false, null, e.message)
+            AuthenticationStatusJson(false, error = "Could not create user session")
+                .apply { log.warn { error } }
+
+        }.getOrElse {
+            AuthenticationStatusJson(false, error = it.message)
+                .apply { log.warn { "start session: $it" } }
         }
-    }
 
     @DeleteMapping("/")
-    fun endSession(session: HttpSession): AuthenticationStatusJson {
-        return try {
+    fun endSession(session: HttpSession): AuthenticationStatusJson =
+        runCatching {
 
             val userSession = session.getAttribute(userSessionKey) as UserSessionJson?
 
-            if (userSession != null) {
-                boIntClient.endSession(userSession.toBoEndSessionCommand())
-            }
+            if (userSession != null) boIntClient.endSession(userSession.toBoEndSessionCommand())
             session.setAttribute(userSessionKey, null)
 
-            AuthenticationStatusJson(false, null, null)
-        } catch (e: Exception) {
-            AuthenticationStatusJson(false, null, e.message)
+            AuthenticationStatusJson(false)
+
+        }.getOrElse {
+            AuthenticationStatusJson(false, error = it.message)
+                .apply { log.warn { "end session: $it" } }
         }
+
+    companion object {
+        private const val userSessionKey = "USER_SESSION"
+        private val log = logger()
     }
 }

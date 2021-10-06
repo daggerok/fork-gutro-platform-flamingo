@@ -9,7 +9,7 @@ import { CloseOutlined } from '@ant-design/icons';
 
 import { allowAbort, formatDateTimeWithWords } from '~/utils/common';
 import { generateReportFromCampaign } from '~/utils/csv-download';
-import ConfirmationDialog from '~/components/ConfirmationDialog';
+import ConfirmationDialog from '~/components/Common/ConfirmationDialog';
 import {
   fetchSchedulingHistoryDetails,
   abortCampaign,

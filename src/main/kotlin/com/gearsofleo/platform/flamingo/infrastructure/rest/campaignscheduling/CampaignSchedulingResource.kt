@@ -1,7 +1,7 @@
 package com.gearsofleo.platform.flamingo.infrastructure.rest.campaignscheduling
 
 import com.gearsofleo.platform.aux.optimove.integration.api.PlatformAuxOptimoveIntegrationCommandApiProtos
-import com.gearsofleo.platform.flamingo.external.OptimoveIntClient
+import com.gearsofleo.platform.aux.optimove.integration.feign.client.OptimoveIntegrationCommandClient
 import com.gearsofleo.platform.flamingo.infrastructure.rest.authentication.UserSessionJson
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -12,7 +12,7 @@ import javax.servlet.http.HttpSession
 
 @RestController
 @RequestMapping("/api/campaign-scheduling")
-class CampaignSchedulingResource(val optimoveIntClient: OptimoveIntClient) {
+class CampaignSchedulingResource(val optimoveIntClient: OptimoveIntegrationCommandClient) {
 
     private final val userSessionKey = "USER_SESSION"
 

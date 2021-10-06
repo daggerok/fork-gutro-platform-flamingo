@@ -1,0 +1,184 @@
+= Flamingo REST API documentation
+
+Flamingo is using few REST APIs clients / integrations:
+
+- https://github.com/gutro/Platform-Aux-Affiliate[Platform-Aux-Affiliate API]
+- https://github.com/gutro/Platform-Aux-Optimove-Integration[Platform-Aux-Optimove-Integration API]
+- https://github.com/gutro/Platform-Integration-Bo-Api[Platform-Integration-Bo-Api API]
+
+== Affiliate API
+
+Detailed information and description of Flamingo Affiliate REST API integration can be found
+on https://confluence.leovegas.com/display/CG/Flamingo+Affiliate+API[according] confluence page
+
+=== API Overview
+
+.Flamingo Affiliate API integration big picture diagram
+[ditaa]
+----
+              /-------------\
+              |  Flamingo   +-------------------+
+              |  Backend    +<------+   Protobuf|
+              \----------+--/  Proto|   Query or|
+                ^        |       DTO:   Command |           /------\
+            JSON|        :JSON      |           |           |      |
+         Request|        |Response  |           |           |      |
+  User          |        V          |           v           :  DB  |
+     __O__    /-*--------+--\    /--+-----------+-----\     |      |
+       | ---->| Flamingo UI |    | Affiliare Services +<-=->+{s}   |
+      / \     \-------------/    \--------------------/     \------/
+----
+
+=== API Operations
+
+==== Create Affiliate operation
+
+.`CreateAffiliateRequest` request:
+include::{snippets}/create-affiliate/http-request.adoc[]
+
+.Created `Affiliate`:
+[source, json]
+include::{snippets}/create-affiliate/response-body.adoc[]
+
+==== Create Affiliate operation expected errors
+
+===== Should not create affiliate without postback
+
+.Given request without postback:
+include::{snippets}/create-affiliate-negative-require-postback/http-request.adoc[]
+
+.Expected `Error`:
+include::{snippets}/create-affiliate-negative-require-postback/http-response.adoc[]
+
+===== Should not create affiliate containing non-unique postback type + affiliate id pair
+
+.Given request containing non-unique postback type + affiliate id pair:
+include::{snippets}/create-affiliate-negative-non-unique-postback/http-request.adoc[]
+
+.Expected `Error`:
+include::{snippets}/create-affiliate-negative-non-unique-postback/http-response.adoc[]
+
+===== Should not create affiliate with not depositThreshold postback containing threshold(s)
+
+.Given request not depositThreshold postback, containing thresholds:
+include::{snippets}/create-affiliate-negative-not-depositThreshold-postback-containing-thresholds/http-request.adoc[]
+
+.Expected `Error`:
+include::{snippets}/create-affiliate-negative-not-depositThreshold-postback-containing-thresholds/http-response.adoc[]
+
+==== Update Affiliate operation
+
+.`UpdateAffiliateRequest` request:
+include::{snippets}/update-affiliate/http-request.adoc[]
+
+.Updated `Affiliate`:
+[source, json]
+include::{snippets}/update-affiliate/response-body.adoc[]
+
+==== Update Affiliate operation expected errors
+
+===== Should not update affiliate which is not in db
+
+.Given request with non-existed affiliate id:
+include::{snippets}/update-affiliate-negative-not-found/http-request.adoc[]
+
+.Expected `Error`:
+include::{snippets}/update-affiliate-negative-not-found/http-response.adoc[]
+
+===== Should not update affiliate without postback
+
+.Given request without postback:
+include::{snippets}/update-affiliate-negative-require-postback/http-request.adoc[]
+
+.Expected `Error`:
+include::{snippets}/update-affiliate-negative-require-postback/http-response.adoc[]
+
+===== Should not update affiliate containing non-unique postback type + affiliate id pair
+
+.Given request containing non-unique postback type + affiliate id pair:
+include::{snippets}/update-affiliate-negative-non-unique-postback/http-request.adoc[]
+
+.Expected `Error`:
+include::{snippets}/update-affiliate-negative-non-unique-postback/http-response.adoc[]
+
+===== Should not update affiliate with not depositThreshold postback containing threshold(s)
+
+.Given request not depositThreshold postback, containing thresholds:
+include::{snippets}/update-affiliate-negative-not-depositThreshold-postback-containing-thresholds/http-request.adoc[]
+
+.Expected `Error`:
+include::{snippets}/update-affiliate-negative-not-depositThreshold-postback-containing-thresholds/http-response.adoc[]
+
+==== Get Affiliate By ID operation
+
+.Get affiliate by ID request:
+include::{snippets}/get-affiliate-by-id/http-request.adoc[]
+
+.Requested `Affiliate`:
+[source, json]
+include::{snippets}/get-affiliate-by-id/response-body.adoc[]
+
+==== Get Affiliate By ID operation expected error
+
+_Should not get affiliate by id which is not in db_
+
+.Given request with non-existed affiliate id:
+include::{snippets}/get-affiliate-by-id-negative-not-found/http-request.adoc[]
+
+.Expected `Error`:
+include::{snippets}/get-affiliate-by-id-negative-not-found/http-response.adoc[]
+
+==== Search Affiliates operation
+
+.Search affiliates request:
+include::{snippets}/get-affiliates/http-request.adoc[]
+
+.Found `Affiliate` objects:
+[source, json]
+include::{snippets}/search-affiliates/response-body.adoc[]
+
+==== Get Affiliates operation
+
+.Get affiliates request:
+include::{snippets}/get-affiliates/http-request.adoc[]
+
+.Found `Affiliate` objects:
+[source, json]
+include::{snippets}/get-affiliates/response-body.adoc[]
+
+==== Delete Affiliate operation
+
+.Delete affiliate by ID request:
+include::{snippets}/delete-affiliate-by-id/http-request.adoc[]
+
+.Result:
+include::{snippets}/delete-affiliate-by-id/http-response.adoc[]
+
+==== Delete Affiliate By ID operation expected error
+
+_Should not delete affiliate by id which is not in db_
+
+.Given request with non-existed affiliate id:
+include::{snippets}/delete-affiliate-by-id-negative-not-found/http-request.adoc[]
+
+.Expected `Error`:
+include::{snippets}/delete-affiliate-by-id-negative-not-found/http-response.adoc[]
+
+== Reference documentation
+
+- https://intellij-asciidoc-plugin.ahus1.de/docs/users-guide/features/advanced/spring-rest-docs.html[Spring REST Docs]
+- https://github.com/stathissideris/ditaa[ditaa reference]
+- http://wiremock.org/docs/[WireMock reference]
+
+---
+
+Technical information:
+
+[subs="attributes"]
+----
+Group ID: {project-group-id}
+Artifact ID: {project-artifact-id}
+Version: {project-version}
+Asciidoctor version: {asciidoctor-version}
+Tools: spring-restdocs-restassured, asciidoctor-maven-plugin
+----

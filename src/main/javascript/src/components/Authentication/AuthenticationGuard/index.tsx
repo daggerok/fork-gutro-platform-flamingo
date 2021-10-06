@@ -4,75 +4,94 @@ import idx from 'idx';
 
 import { routes } from '~/routes';
 import { fetchIsAuthenticated } from '~/api/auth';
-import {
-  AuthenticationResult,
-  AuthenticationGuardProps,
-} from '~/components/Authentication/types';
+import { AuthenticationGuardProps } from '~/components/Authentication/types';
 
 import { AuthenticationContext } from '../AuthenticationContextProvider';
 import FullpageSpinner from './FullpageSpinner';
 import FullpageError from './FullpageError';
 
+import { getCustomLandingPage } from '~/utils/local-storage';
+import { hasPermission } from '~/utils/role-check';
+
 const LOGIN_PATH = routes.login.path;
-const START_PAGE_PATH = routes.csvUpload.path;
+
 
 const AuthenticationGuard: React.FC<AuthenticationGuardProps> = ({ children }: AuthenticationGuardProps) => {
   const [waitingForPotentialRedirect, setWaitingForPotentialRedirect] = useState<boolean>(true);
   const [authenticationStatusError, setAuthenticationStatusError] = useState<string | null>(null);
-  const { authenticated, setAuthenticated } = useContext(AuthenticationContext);
+  const [permissionState, setPermissionState] = useState<boolean>(false);
+  
+  const { authenticated, setAuthenticated, user, setUser } = useContext(AuthenticationContext);
 
-  const checkAuthenticated = async (): Promise<AuthenticationResult> => {
-    return fetchIsAuthenticated()
+  const START_PAGE_PATH = getCustomLandingPage();
+
+  const history = useHistory();
+  const location = useLocation();
+
+  const goToStart = (): void => { history.replace(START_PAGE_PATH); };
+  const goToLogin = (): void => { history.replace(LOGIN_PATH); };
+
+  const triggerRedirectTimeout = (): void => {
+    setTimeout(() => {
+      setWaitingForPotentialRedirect(false);
+    }, 1000);
+  };
+
+  const initAuthentication = (): void => {
+    fetchIsAuthenticated()
       .then((response) => {
-        return {
-          authenticated: idx(response, _ => _.data.authenticated) || false,
-          error: null,
-        };
+        setUser(idx(response, _ => _.data.user));
+        setAuthenticated(idx(response, _ => _.data.authenticated));
+        triggerRedirectTimeout();
       })
-      .catch((err) => {
-        return {
-          authenticated: null,
-          error: err.message,
-        };
+      .catch((error) => {
+        setAuthenticationStatusError(error.messsage);
+        setAuthenticated(false);
       });
   };
 
   useEffect(() => {
-    const fetchAuthenticatedStatus = async (): Promise<void> => {
-      const authenticationResult = await checkAuthenticated();
-
-      if (authenticationResult.error) {
-        setAuthenticationStatusError(authenticationResult.error);
-      } else {
-        setAuthenticated(authenticationResult.authenticated);
-      }
-    };
-    fetchAuthenticatedStatus();
+    initAuthentication();
   }, []);
 
-  const history = useHistory();
-  const location = useLocation();
   useEffect(() => {
-    if (authenticated === true && location.pathname === LOGIN_PATH) {
-      history.replace(START_PAGE_PATH);
+    if (!user && location.pathname === LOGIN_PATH) { 
+      setPermissionState(true); 
+    } else if (user) {
+      const permitted = hasPermission(location, user.roles);
+      setPermissionState(permitted); 
     }
-    if (authenticated === false && location.pathname !== LOGIN_PATH) {
-      history.replace(LOGIN_PATH);
-    }
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (authenticated && location.pathname === LOGIN_PATH) { goToStart(); }
+    if (!authenticated && location.pathname !== LOGIN_PATH) { goToLogin(); }
 
     if (authenticated !== null) {
-      setTimeout(() => {
-        setWaitingForPotentialRedirect(false);
-      }, 1000);
+      triggerRedirectTimeout();
     }
   }, [authenticated]);
 
   if (authenticationStatusError) {
-    return <FullpageError error={authenticationStatusError} />;
+    return (
+      <FullpageError 
+        error="500" 
+        message={`Authentication service not available. Slack #plat-retention-dev for help. Error: ${authenticationStatusError}`} 
+      />
+    );
   }
 
   if (waitingForPotentialRedirect) {
     return <FullpageSpinner />;
+  }
+
+  if (!permissionState) {
+    return (
+      <FullpageError 
+        error="403"
+        message="You don't have permission to view this page. You are probably missing a required role."
+      />
+    );
   }
 
   return <>{children}</>;

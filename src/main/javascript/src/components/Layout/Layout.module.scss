@@ -1,6 +1,7 @@
 .layout {
   width: 100vw;
   height: 100vh;
+  position: relative;
 }
 
 .menu {
@@ -13,6 +14,24 @@
 
 .logoutButton {
   display: inline-block;
+}
+
+.toTheLeft {
+  float:right;
+}
+
+.userName {
+  color:rgba(255, 255, 255, 0.65);
+}
+
+.userName  {
+  color:rgba(255, 255, 255, 0.65);
+  margin-right: 2em;
+
+  & .userIcon {
+    color:rgba(255, 255, 255, 0.65);
+    margin: 10px 10px;
+  }
 }
 
 .content {

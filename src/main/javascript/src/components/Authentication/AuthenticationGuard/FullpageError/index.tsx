@@ -1,30 +1,31 @@
 import React from 'react';
-import { Button } from 'antd';
+import { Button, Result } from 'antd';
+
+import { Page } from '~/types';
+import { getFullPath } from '~/utils/routes';
 
 import Layout from '~/components/Layout';
-import {
-  FullpageErrorProps,
-} from '~/components/Authentication/types';
+import { FullpageErrorProps } from '~/components/Authentication/types';
 
-import styles from './FullpageError.module.scss';
-
-const FullpageError: React.FC<FullpageErrorProps> = ({ error }: FullpageErrorProps) => {
-  const handleTryAgainClick = (): void => {
-    window.location.reload();
-  };
+const FullpageError: React.FC<FullpageErrorProps> = ({ 
+  error, 
+  message = 'Ooops, something went wrong', 
+}: FullpageErrorProps) => {
 
   return (
     <Layout>
-      <div className={styles.errorContainer}>
-        <span>Error: {error}</span>
-
-        <Button
-          onClick={handleTryAgainClick}
-          className={styles.tryAgainButton}
+      <Result
+        status={error}
+        title={error}
+        subTitle={message}
+        extra={
+        <Button 
+          type="primary" 
+          href={getFullPath(Page.Landing)}
         >
-          Try again
-        </Button>
-      </div>
+          Back Home
+        </Button>}
+      />
     </Layout>
   );
 };

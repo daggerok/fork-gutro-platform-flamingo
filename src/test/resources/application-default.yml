@@ -1,0 +1,37 @@
+logging:
+  level:
+    com.gearsofleo.platform.aux.affiliate.api.client.AffiliateClient: DEBUG
+#########################################################################################
+# This WireMock configuration disables service discovery and sets static load balancing #
+#########################################################################################
+hyraco:
+  feign:
+    client:
+      default-config: hyraco-feign-default-test
+    config:
+      hyraco-feign-default-test:
+        load-balancing:
+          affinity:
+            enabled: false
+            request-path: /testing-default
+            cache:
+              initialSize: 100
+              maxSize: 10000
+              ttl: 10s
+  leader:
+    consul:
+      enabled: false
+spring:
+  cloud:
+    consul:
+      enabled: false
+      host: 127.0.0.1:8500
+      discovery:
+        enabled: false
+        register: false
+      health:
+        consul:
+          enabled: false
+  output:
+    ansi:
+      enabled: always

@@ -1,0 +1,7 @@
+.variableContainer {
+  margin-top: 2em;
+  & p {
+    cursor: copy;
+    margin-bottom: 20px;
+  }
+}

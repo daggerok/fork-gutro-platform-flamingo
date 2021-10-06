@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { Layout as AntdLayout } from 'antd';
 const { Content } = AntdLayout;
+import { UserOutlined } from '@ant-design/icons';
 
 import Header from './Header';
 import Menu from './Menu';
@@ -11,7 +12,7 @@ import LogoutButton from './LogoutButton';
 import styles from './Layout.module.scss';
 
 const Layout: React.FC<LayoutProps> = ({ children }: LayoutProps) => {
-  const { authenticated } = useContext(AuthenticationContext);
+  const { authenticated, user } = useContext(AuthenticationContext);
 
   return (
     <AntdLayout className={styles.layout}>
@@ -22,6 +23,12 @@ const Layout: React.FC<LayoutProps> = ({ children }: LayoutProps) => {
               <Menu />
             </div>
             <div className={styles.divider} />
+            { user && 
+              <div className={styles.userName}>
+                <UserOutlined className={styles.userIcon} /> 
+                { user?.firstname }
+              </div>
+            }
             <div className={styles.logoutButton}>
               <LogoutButton />
             </div>

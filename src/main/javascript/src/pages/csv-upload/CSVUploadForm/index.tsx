@@ -7,22 +7,25 @@ import {
   Spin,
   message,
 } from 'antd';
-import { UploadFile, UploadChangeParam, RcCustomRequestOptions } from 'antd/lib/upload/interface';
+
+import { UploadFile, UploadChangeParam } from 'antd/lib/upload/interface';
 import { Store } from 'antd/lib/form/interface';
 import { InboxOutlined } from '@ant-design/icons';
 
-import ResultPopup from '~/components/ResultPopup';
+import { Role } from '~/types';
+
+import ResultPopup from '~/components/Common/ResultPopup';
+
 import {
   ScheduledPlayer,
   getPlayerListFromFiles,
   isBeforeToday,
 } from '~/utils/csv-upload';
-import {
-  getTimeZoneOffset,
-} from '~/utils/common';
-import {
-  schedulePromotions,
-} from '~/api/scheduling';
+
+import { getTimeZoneOffset } from '~/utils/common';
+import { hasRole } from '~/utils/role-check';
+
+import { schedulePromotions } from '~/api/scheduling';
 
 import {
   CSVUploadFormProps,
@@ -58,6 +61,8 @@ const CSVUploadForm: React.FC<CSVUploadFormProps> = ({ onUpdate }: CSVUploadForm
   const [ schedulingPromotions, setSchedulingPromotions ] = useState<Array<ScheduledPlayer> | null>(null);
   const [ form ] = Form.useForm();
 
+  const hasEditRights = hasRole(Role.PROMOTION_SCHEDULING_WRITE);
+
   const onFinish = async (values: Store): Promise<void> => {
     if (!values.csvFiles.length || !values.scheduleDate) {
       return;
@@ -66,8 +71,8 @@ const CSVUploadForm: React.FC<CSVUploadFormProps> = ({ onUpdate }: CSVUploadForm
     setIsLoading(true);
 
     try {
-      const schedulingPromotions = await getPlayerListFromFiles(values.csvFiles, values.scheduleDate);
-      setSchedulingPromotions(schedulingPromotions);
+      const promisedSchedulingPromotions = await getPlayerListFromFiles(values.csvFiles, values.scheduleDate);
+      setSchedulingPromotions(promisedSchedulingPromotions);
       setConfirmationModalOpen(true);
     
     } catch (e) {
@@ -107,7 +112,7 @@ const CSVUploadForm: React.FC<CSVUploadFormProps> = ({ onUpdate }: CSVUploadForm
     return e && (Array.isArray(e) ? e : e.fileList);
   };
 
-  const mockUploadRequest = ({ onSuccess, file }: RcCustomRequestOptions): void => {
+  const mockUploadRequest = ({ onSuccess, file }: any): void => {  //eslint-disable-line @typescript-eslint/no-explicit-any
     setTimeout(() => {
       onSuccess({}, file);
     }, 100);
@@ -150,6 +155,7 @@ const CSVUploadForm: React.FC<CSVUploadFormProps> = ({ onUpdate }: CSVUploadForm
             className={styles.dragger}
             accept=".csv"
             customRequest={mockUploadRequest}
+            disabled={!hasEditRights}
           >
             <div className={styles.draggerInnerContainer}>
               <p className="ant-upload-drag-icon">
@@ -175,6 +181,7 @@ const CSVUploadForm: React.FC<CSVUploadFormProps> = ({ onUpdate }: CSVUploadForm
               minuteStep: 5,
             }}
             disabledDate={isBeforeToday}
+            disabled={!hasEditRights}
           />
         </Form.Item>
 
@@ -183,6 +190,8 @@ const CSVUploadForm: React.FC<CSVUploadFormProps> = ({ onUpdate }: CSVUploadForm
           <Button
             type="primary"
             htmlType="submit"
+            style={{width: '100%'}}
+            disabled={!hasEditRights}
           >
             Submit
           </Button>

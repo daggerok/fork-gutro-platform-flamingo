@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Menu } from 'antd';
+import { Button } from 'antd';
 
 import { AuthenticationContext } from '~/components/Authentication/AuthenticationContextProvider';
 import { logoutPlayer } from '~/api/auth';
@@ -13,17 +13,13 @@ const LogoutButton: React.FC = () => {
   };
 
   return (
-    <Menu
-      theme="dark"
-      mode="horizontal"
+    <Button 
+      key="logout-button"
+      onClick={handleLogoutClick}
+      ghost
     >
-      <Menu.Item
-        key="logout-button"
-        onClick={handleLogoutClick}
-      >
-        Log Out
-      </Menu.Item>
-    </Menu>
+      Log Out
+    </Button>
   );
 };
 

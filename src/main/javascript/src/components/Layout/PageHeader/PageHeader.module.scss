@@ -1,0 +1,14 @@
+.pageHeader {
+  padding: 1em 2em;
+
+  & h1 {
+    margin: 0;
+    color: #ffffff !important;
+  }
+
+  & .subtitle {
+    color: rgba(0, 0, 0, 0.6);
+    margin: 0;
+  }
+
+}

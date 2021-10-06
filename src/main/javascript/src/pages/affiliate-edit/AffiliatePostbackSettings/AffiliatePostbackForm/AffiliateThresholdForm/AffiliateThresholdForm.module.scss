@@ -1,0 +1,18 @@
+.panelHeaderRow {
+  width: 90%;
+  float: right;
+  align-items: center;
+  justify-content: flex-end;
+
+  .deleteButton {
+    float: right;
+  }
+
+  & h4 {
+    margin: 0;
+  }
+}
+
+.formRow {
+  margin-bottom: 1em !important;
+}

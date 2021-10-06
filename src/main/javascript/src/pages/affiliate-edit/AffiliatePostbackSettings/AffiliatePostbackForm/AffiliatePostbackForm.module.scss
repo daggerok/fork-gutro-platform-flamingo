@@ -1,0 +1,45 @@
+.addPostbackButton {
+  position: absolute !important;
+  top: 0;
+  right: 0;
+}
+
+.formSectionHeader {
+  margin-bottom: 2em;
+}
+
+.tagContainer {
+  margin-bottom: 0.5em;
+}
+
+.panelHeaderRow {
+  width: 90%;
+  float: right;
+  align-items: center;
+  justify-content: flex-end;
+
+  .deleteButton {
+    float: right;
+  }
+
+  & h3, h4 {
+    margin: 0;
+  }
+}
+
+.countryTag {
+  padding: 5px 10px !important;
+  border: 1px solid #e1e1e1 !important;
+  margin: 0 0 5px 5px !important;
+  width: 75px !important;
+
+  & .countryIso {
+    font-weight: bold;
+    margin-left: 10px;
+  }
+}
+
+.infoText {
+  margin-top: 1em;
+  display: block;
+}

@@ -1,6 +1,11 @@
 package com.gearsofleo.platform.flamingo.infrastructure.rest.authentication
 
-data class AuthenticationStatusJson(val authenticated: Boolean, val user: UserJson?, val error: String?)
+data class AuthenticationStatusJson(
+    val authenticated: Boolean,
+    val user: UserJson? = null,
+    val error: String? = null,
+)
+
 data class UserJson(
     val email: String,
     val firstname: String,

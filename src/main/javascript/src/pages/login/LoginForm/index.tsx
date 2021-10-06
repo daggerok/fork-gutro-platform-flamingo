@@ -1,6 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { Spin, Form, Input, Button, Typography } from 'antd';
-const { Text } = Typography;
+import { Spin, Form, Input, Button, Alert } from 'antd';
 import { Store } from 'antd/lib/form/interface';
 import idx from 'idx';
 
@@ -8,28 +7,28 @@ import { AuthenticationContext } from '~/components/Authentication/Authenticatio
 import { loginPlayer } from '~/api/auth';
 import { LAYOUT, TAIL_LAYOUT, FORM_RULES } from './constants';
 
-import styles from './LoginForm.module.scss';
-
 const LoginForm: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 
-  const { setAuthenticated } = useContext(AuthenticationContext);
+  const { setAuthenticated, setUser } = useContext(AuthenticationContext);
 
   const onFinish = (values: Store): void => {
     setIsLoading(true);
 
     loginPlayer(values.username, values.password)
       .then((response) => {
-        const user = idx(response, _ => _.data.user);
+        const user = idx(response, (_) => _.data.user);
+
         if (user) {
           setLoginError(null);
           setAuthenticated(true);
+          setUser(user);
         } else {
-          const error = `Login failed\n${idx(response, _ => _.data.error)}`;
+          const error = `Login failed\n${idx(response, (_) => _.data.error)}`;
           setLoginError(error);
-          setIsLoading(false);
         }
+        setIsLoading(false);
       })
       .catch((err) => {
         setLoginError(err.message);
@@ -42,9 +41,7 @@ const LoginForm: React.FC = () => {
       <Form
         {...LAYOUT}
         name="basic"
-        initialValues={{
-          remember: true,
-        }}
+        initialValues={{ remember: true }}
         onFinish={onFinish}
       >
         <Form.Item
@@ -52,7 +49,7 @@ const LoginForm: React.FC = () => {
           name="username"
           rules={FORM_RULES.username}
         >
-          <Input />
+          <Input/>
         </Form.Item>
 
         <Form.Item
@@ -67,15 +64,20 @@ const LoginForm: React.FC = () => {
           <Button
             type="primary"
             htmlType="submit"
+            style={{ width: '100%' }}
           >
             Submit
           </Button>
         </Form.Item>
 
         {loginError && (
-          <Form.Item className={styles.errorMessage}>
-            <Text type="danger">{loginError}</Text>
-          </Form.Item>
+          <Alert
+            message="Error"
+            description={loginError}
+            type="error"
+            showIcon
+            style={{ width: '100%' }}
+          />
         )}
       </Form>
     </Spin>

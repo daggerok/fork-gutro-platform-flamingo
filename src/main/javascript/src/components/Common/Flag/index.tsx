@@ -11,6 +11,7 @@ const Flag: React.FC<FlagProps> = ({
   if (!country) return null;
   return (
     <span
+      title={country}
       className={classnames(
         styles.flagIcon,
         `flag-icon flag-icon-${country.toLowerCase()}`
