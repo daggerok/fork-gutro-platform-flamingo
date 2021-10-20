@@ -248,6 +248,7 @@ const AffiliatePostbackForm: React.FC<AffiliatePostbackFormProps> = ({
     <Collapse 
       accordion
       expandIcon={({isActive}): JSX.Element => isActive ?  <CloseCircleFilled/> : <EditFilled />}
+      defaultActiveKey={postback.id ? -1 : postbackIndex}
     >
       { showConfirmationDialog &&
       <ConfirmationDialog 
@@ -260,7 +261,7 @@ const AffiliatePostbackForm: React.FC<AffiliatePostbackFormProps> = ({
       <Panel 
         header={panelHeader} 
         key={postbackIndex} 
-        style={{ position: 'relative' }}
+        style={{ position: 'relative', backgroundColor: postback.id ? '#fafafa' : '#ffb2b2' }}
       >
         <Form
           className={styles.settingsForm}

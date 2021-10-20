@@ -7,7 +7,7 @@ import { Page } from '~/types';
 import { AffiliatePostback, Affiliate } from '~/components/Affiliate/types';
 
 import { getFullPath } from '~/utils/routes';
-import { convertDateToString } from '~/utils/common';
+import { convertDateToString, sortBy } from '~/utils/common';
 import { saveCustomLandingPage } from '~/utils/local-storage';
 import { AffiliateContext } from '~/components/Affiliate/AffiliateContextProvider';
 
@@ -72,7 +72,7 @@ const AffiliateList: React.FC<AffiliateListProps> = ({
       title: 'ID',
       dataIndex: 'affiliateId',
       key: 'affiliateId',
-      sorter: (a: Affiliate, b: Affiliate): number => Number(a.affiliateId) - Number(b.affiliateId),
+      sorter: (a: Affiliate, b: Affiliate): number => sortBy(a.affiliateId, b.affiliateId),
     },
     {
       title: 'Name',
@@ -130,6 +130,7 @@ const AffiliateList: React.FC<AffiliateListProps> = ({
       render: (createdTimestamp: string): JSX.Element => {
         return dateElement(createdTimestamp);
       },
+      sorter: (a: Affiliate, b: Affiliate): number  => sortBy(a.createdTimestamp, b.createdTimestamp),
     },
     {
       title: 'Updated',
@@ -140,6 +141,7 @@ const AffiliateList: React.FC<AffiliateListProps> = ({
         if (!updatedTimestamp) { return <span>-</span>; }
         return dateElement(updatedTimestamp);
       },
+      sorter: (a: Affiliate, b: Affiliate): number  => sortBy(a.updatedTimestamp, b.updatedTimestamp),
     },
   ];
 

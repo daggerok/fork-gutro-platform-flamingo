@@ -269,7 +269,7 @@ const AffiliateEdit: React.FC = () => {
           onClick={onAffiliateDelete}
           icon={<DeleteOutlined />}
           size="large"
-          disabled={!hasEditRights}
+          disabled={!hasEditRights || !currentAffiliate?.createdTimestamp}
         >
           Delete
         </Button>
@@ -278,7 +278,7 @@ const AffiliateEdit: React.FC = () => {
           onClick={onAffiliateSave}
           icon={<SaveOutlined />}
           size="large"
-          disabled={!hasEditRights}
+          disabled={!hasEditRights || saved}
         >
           Save
         </Button>
