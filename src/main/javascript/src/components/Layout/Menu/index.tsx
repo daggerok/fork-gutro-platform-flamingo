@@ -66,6 +66,7 @@ const Menu: React.FC = () => {
       mode="horizontal" 
       style={{ width: 512 }}
       selectedKeys={[selectedKey]}
+      data-testid="main-menu"
     >
       { permittedMenuItems.map((menuItem: any) => (
         <SubMenu 

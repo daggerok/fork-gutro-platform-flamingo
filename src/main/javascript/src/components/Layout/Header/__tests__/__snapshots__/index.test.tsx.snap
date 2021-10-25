@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Header /> matches snapshot 1`] = `
+<header
+  class="ant-layout-header header"
+  data-testid="header"
+>
+  <img
+    class="logo"
+    data-testid="header-logo"
+    src="logo.png"
+  />
+  <span
+    class="title"
+    data-testid="header-title"
+  >
+    Flamingo
+  </span>
+  <div
+    class="flagContainer"
+    data-testid="header-flag-container"
+  >
+    <environment-flag />
+  </div>
+</header>
+`;

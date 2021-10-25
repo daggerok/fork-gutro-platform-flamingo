@@ -11,9 +11,13 @@
   },
   "dependencies": {
     "@ant-design/icons": "^4.3.0",
+    "@testing-library/react-hooks": "^7.0.1",
+    "@types/enzyme": "^3.10.9",
     "antd": "^4.16.13",
     "axios": "^0.19.2",
     "classnames": "^2.3.1",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.6",
     "flag-icon-css": "^3.5.0",
     "idx": "^2.5.6",
     "moment": "^2.29.1",
@@ -53,6 +57,11 @@
       "last 1 safari version"
     ]
   },
+  "jest": {
+    "setupFilesAfterEnv": [
+      "<rootDir>/test/setupTests.js"
+    ]
+  },
   "babel": {
     "plugins": [
       [
@@ -60,9 +69,17 @@
         {
           "rootPathSuffix": "src"
         }
+      ],
+      [
+        "@babel/plugin-proposal-private-methods",
+        {
+          "loose": true
+        }
       ]
     ],
-    "presets": "react-app"
+    "presets": [
+      "@babel/preset-env"
+    ]
   },
   "homepage": "/flamingo",
   "proxy": "http://localhost:8080"

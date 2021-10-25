@@ -5,13 +5,12 @@ import { FlagProps } from './types';
 
 import styles from './index.module.scss';
 
-const Flag: React.FC<FlagProps> = ({
-  country,
-}: FlagProps) => {
+const Flag: React.FC<FlagProps> = ({ country }: FlagProps) => {
   if (!country) return null;
+
   return (
     <span
-      title={country}
+      data-testid="flag-component"
       className={classnames(
         styles.flagIcon,
         `flag-icon flag-icon-${country.toLowerCase()}`

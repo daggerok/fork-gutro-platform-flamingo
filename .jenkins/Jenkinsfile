@@ -59,6 +59,7 @@ pipeline {
           dir('src/main/javascript') {
             sh(script: 'leo-ci login npm', label: 'Yarn Login')
             sh(script: 'yarn install', label: 'Yarn Install Dependencies')
+            sh(script: 'yarn test', label: 'Yarn Test')
             sh(script: 'yarn build', label: 'Yarn Build')
           }
         }

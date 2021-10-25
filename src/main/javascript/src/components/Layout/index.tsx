@@ -15,7 +15,10 @@ const Layout: React.FC<LayoutProps> = ({ children }: LayoutProps) => {
   const { authenticated, user } = useContext(AuthenticationContext);
 
   return (
-    <AntdLayout className={styles.layout}>
+    <AntdLayout 
+      className={styles.layout} 
+      data-testid="layout-element"
+    >
       <Header>
         { authenticated && (
           <>

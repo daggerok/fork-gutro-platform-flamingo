@@ -15,6 +15,7 @@ const LogoutButton: React.FC = () => {
   return (
     <Button 
       key="logout-button"
+      data-testid="logout-button-wrapper"
       onClick={handleLogoutClick}
       ghost
     >

@@ -31,6 +31,26 @@ Open a second terminal and run:
 Open [http://localhost:3000](http://localhost:3000) to see the result. It uses the backend service for the `/api` routes, so the backend needs to be running in the background for the frontend to work.\
 Login with your regular BO credentials.
 
+## Run frontend tests
+
+# Run all tests
+
+```bash
+/platform-flamingo/src/main/javascript > $ yarn test
+```
+
+# Run specific test by reg exp
+
+```bash
+/platform-flamingo/src/main/javascript > $ yarn -u ComponentName
+```
+
+# Update test 
+
+```bash
+/platform-flamingo/src/main/javascript > $ yarn -u test
+```
+
 ---
 
 ## Production builds

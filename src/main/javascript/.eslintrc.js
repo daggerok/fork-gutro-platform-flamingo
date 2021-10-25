@@ -17,7 +17,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended'
   ],
   rules: {
-    '@typescript-eslint/no-explicit-any': 0,
+    '@typescript-eslint/no-explicit-any': 'off',
     'semi': ['error', 'always'],
     'brace-style': ['error', '1tbs', { allowSingleLine: true }],
     'object-property-newline': ['error', {

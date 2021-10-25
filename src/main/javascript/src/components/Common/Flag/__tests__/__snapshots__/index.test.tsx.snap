@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Flag /> matches snapshot 1`] = `
+<span
+  class="flagIcon flag-icon flag-icon-mt"
+  data-testid="flag-component"
+/>
+`;

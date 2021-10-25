@@ -14,6 +14,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
       visible={true}
       closable={false}
       footer={null}
+      data-testid="confirmation-dialog"
     >
       <Result
         status="warning"
@@ -21,9 +22,19 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
         subTitle={subTitle}
         extra={[
           <Button
+            danger
+            type="primary"
+            key="ok"
+            onClick={onOkClick}
+            data-testid="confirmation-ok-button"
+          >
+            OK
+          </Button>,
+          <Button
             type="default"
             key="cancel"
             onClick={onCancelClick}
+            data-testid="confirmation-cancel-button"
           >
             Cancel
           </Button>,
