@@ -69,15 +69,6 @@ exports[`<ConfirmationDialog /> matches snapshot 1`] = `
               class="ant-result-extra"
             >
               <button
-                class="ant-btn ant-btn-primary ant-btn-dangerous"
-                data-testid="confirmation-ok-button"
-                type="button"
-              >
-                <span>
-                  OK
-                </span>
-              </button>
-              <button
                 class="ant-btn ant-btn-default"
                 data-testid="confirmation-cancel-button"
                 type="button"
@@ -88,6 +79,7 @@ exports[`<ConfirmationDialog /> matches snapshot 1`] = `
               </button>
               <button
                 class="ant-btn ant-btn-primary"
+                data-testid="confirmation-ok-button"
                 type="button"
               >
                 <span>

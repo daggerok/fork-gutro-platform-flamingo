@@ -22,15 +22,6 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
         subTitle={subTitle}
         extra={[
           <Button
-            danger
-            type="primary"
-            key="ok"
-            onClick={onOkClick}
-            data-testid="confirmation-ok-button"
-          >
-            OK
-          </Button>,
-          <Button
             type="default"
             key="cancel"
             onClick={onCancelClick}
@@ -42,6 +33,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             type="primary"
             key="ok"
             onClick={onOkClick}
+            data-testid="confirmation-ok-button"
           >
             OK
           </Button>,
