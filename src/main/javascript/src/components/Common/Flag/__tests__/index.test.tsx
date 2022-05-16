@@ -1,28 +1,26 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
+import React from "react";
+import { render, screen } from "@testing-library/react";
 
-import Flag  from '..';
+import Flag from "..";
 
 let component: any = null;
 
-describe('<Flag />', () => {
+describe("<Flag />", () => {
+  it("by default", () => {
+    const { asFragment } = render(<Flag country="mt" />);
 
-  beforeAll(() => {
-    render(<Flag country="mt"/>);
-    component = screen.getByTestId('flag-component');
+    expect(asFragment()).toMatchSnapshot();
   });
 
-  it('matches snapshot', () => {
-    expect(component).toMatchSnapshot();
+  it("without countrry", () => {
+    const { asFragment } = render(<Flag country={""} />);
+
+    expect(asFragment()).toMatchSnapshot();
   });
 
-  it('applies correct country class - malta', () => {
-    expect(component).toHaveClass('flag-icon flag-icon-mt');
-  });
+  it("with small size", () => {
+    const { asFragment } = render(<Flag country={"SE"} isSmall />);
 
-  afterAll(() => {
-    component.remove();
-    component = null;
+    expect(asFragment()).toMatchSnapshot();
   });
-
 });

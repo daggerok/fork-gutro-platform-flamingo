@@ -1,101 +1,50 @@
 import React, { useEffect, useContext, useState } from 'react';
-import { Form, Input, Switch, Row, Col, Select, Card, notification } from 'antd';
-import idx from 'idx';
+import {
+  Form,
+  Input,
+  Switch,
+  Row,
+  Col,
+  Select,
+  Card,
+} from 'antd';
 
-import { Brand, ValidationObject, ValidationType } from '~/types';
+import { Brand } from '~/types';
 
 import { AffiliateContext } from '~/components/Affiliate/AffiliateContextProvider';
-import { AffiliatePostback } from '~/components/Affiliate/types';
 
 import { convertDateToString } from '~/utils/common';
 
 import { AffiliateBaseSettingsFormProps } from './types';
 
 import styles from './AffiliateBaseSettingsForm.module.scss';
+import { getSelectedBrandObjectFromOperatorUid } from './utils';
 
 const { Option } = Select;
 
 const AffiliateBaseSettingsForm: React.FC<AffiliateBaseSettingsFormProps> = ({
   hasEditRights,
 }: AffiliateBaseSettingsFormProps) => {
-
-  const {
-    currentAffiliate,
-    setCurrentAffiliate,
-    brands,
-    selectedBrand,
-    setSelectedBrand,
-  } = useContext(AffiliateContext);
+  const { currentAffiliate, setCurrentAffiliate, brands, setSelectedBrands } =
+    useContext(AffiliateContext);
 
   const [createdDate, setCreatedDate] = useState<string | null>(null);
   const [updatedDate, setUpdatedDate] = useState<string | null>(null);
 
-  const getSelectedBrandObjectFromOperatorUid = (operatorUid: string): any => {
-    return brands.find((brand: Brand) => brand.brand === operatorUid);
-  };
-
   useEffect(() => {
     if (currentAffiliate.operatorUIDs) {
-      const brandObject = getSelectedBrandObjectFromOperatorUid(
-        currentAffiliate.operatorUIDs[0]
+      const brandObjects = currentAffiliate.operatorUIDs.map(
+        operatorUid => getSelectedBrandObjectFromOperatorUid(operatorUid, brands)
       );
-      setSelectedBrand(brandObject);
-    } else {
-      setSelectedBrand(null);
+
+      setSelectedBrands(brandObjects);
     }
   }, [currentAffiliate]);
 
-  const containsUnavailableCountries = (brand: Brand): boolean => {
-
-    const brandCountryIsos: Array<string> = brand.countries?.map(({ iso }) => iso);
-
-    currentAffiliate.postbacks.forEach((postback: AffiliatePostback) => {
-      if (postback.countries) {
-        const unavailable = postback.countries.some((postbackCountry) =>
-          brandCountryIsos.every((iso: string) => postbackCountry !== iso)
-        );
-
-        const unavailableIsos = postback.countries.filter((postbackCountry) =>
-          brandCountryIsos.every((iso: string) => postbackCountry !== iso)
-        );
-
-        if (unavailable) {
-          throw new Error(`The following selected markets are not available for the brand you changed to: ${unavailableIsos.join(', ')}`);
-        }
-      }
-    });
-    return false;
-  };
-
-  const openNotification = (error: ValidationObject): void => {
-    notification.open({
-      type: error.type,
-      message: error.message,
-      duration: 8,
-    });
-  };
-
-  const addSelectedBrand = (brandToAdd: string): void => {
-
-    const brand = getSelectedBrandObjectFromOperatorUid(brandToAdd);
-    setSelectedBrand(brand);
-
-    try {
-      containsUnavailableCountries(brand);
-    } catch (e) {
-      if (e instanceof Error) {
-        const newError = {
-          relatedElement: 'postbackCountries',
-          type: ValidationType.Warning,
-          message: e.toString(),
-        };
-        openNotification(newError);
-      }
-    }
-
+  const addSelectedBrand = (operatorUIDs: string[]): void => {
     setCurrentAffiliate({
       ...currentAffiliate,
-      operatorUIDs: [brandToAdd],
+      operatorUIDs,
     });
   };
 
@@ -153,8 +102,8 @@ const AffiliateBaseSettingsForm: React.FC<AffiliateBaseSettingsFormProps> = ({
           value: currentAffiliate.affiliateId,
         },
         {
-          name: ['brand'],
-          value: idx(selectedBrand, (_) => _.label) || '',
+          name: ['brands'],
+          value: currentAffiliate.operatorUIDs || [],
         },
       ]}
     >
@@ -169,69 +118,82 @@ const AffiliateBaseSettingsForm: React.FC<AffiliateBaseSettingsFormProps> = ({
             checked={currentAffiliate.enabled}
             onChange={handleEnabledCheckChange}
             disabled={!hasEditRights}
+            data-testid="affiliate-enabled"
           />
         </Form.Item>
         <Form.Item
           name="affiliateId"
           label="Affiliate id"
-          rules={[{ 
-            required: true,
-            message: 'Please fill in a valid affiliate id.',
-          }]}
+          rules={[
+            {
+              required: true,
+              message: 'Please fill in a valid affiliate id.',
+            },
+          ]}
         >
           <Input
             onChange={handleIdChange}
             disabled={!hasEditRights || Boolean(createdDate)}
+            data-testid="affiliate-id"
           />
         </Form.Item>
         <Form.Item
           name="affiliateName"
           label="Affiliate name"
-          rules={[{ 
-            required: true,
-            message: 'Please fill in a name.',
-          }]}
+          rules={[
+            {
+              required: true,
+              message: 'Please fill in a name.',
+            },
+          ]}
         >
-          <Input 
-            onChange={handleNameChange} 
-            disabled={!hasEditRights} 
+          <Input
+            onChange={handleNameChange}
+            disabled={!hasEditRights}
+            data-testid="affiliate-name"
           />
         </Form.Item>
         <Form.Item
-          name="brand"
+          name="brands"
           label="Brand"
-          rules={[{ 
-            required: true,
-            message: 'Please select a brand.',
-          }]}
+          data-testid="affiliate-brands"
+          rules={[
+            {
+              required: true,
+              message: 'Please select brands.',
+            },
+          ]}
         >
           <Select
             disabled={!hasEditRights}
             showSearch
-            placeholder='Select brand'
+            mode="multiple"
+            placeholder="Select brands"
             onChange={addSelectedBrand}
-            optionFilterProp='children'
-            filterOption={(input, option): boolean =>
-              option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-            }
+            optionFilterProp="children"
+            data-testid="affiliate-brand-select"
+            filterOption={(input, option): boolean => {
+              const children: any = option?.children;
+
+              return children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+            }}
           >
-            {brands.map(
-              (brand: Brand): JSX.Element => {
-                return (
-                  <Option 
-                    key={brand.brand} 
-                    value={brand.brand}
-                  >
-                    {brand.label}
-                  </Option>
-                );
-              }
-            )}
+            {brands.map(({ brand, label }: Brand): JSX.Element => {
+              return (
+                <Option
+                  key={brand}
+                  value={brand}
+                  data-testid={`select-brand-${brand}`}
+                >
+                  {label}
+                </Option>
+              );
+            })}
           </Select>
         </Form.Item>
       </fieldset>
       <Row 
-        className={styles.dateElemRow} 
+        className={styles.dateElemRow}
         gutter={8}
       >
         {createdDate && (
@@ -248,7 +210,6 @@ const AffiliateBaseSettingsForm: React.FC<AffiliateBaseSettingsFormProps> = ({
             </Card>
           </Col>
         )}
-
       </Row>
     </Form>
   );

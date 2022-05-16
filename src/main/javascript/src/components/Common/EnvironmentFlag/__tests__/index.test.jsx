@@ -3,7 +3,7 @@ import { mount } from 'enzyme';
 import { act } from 'react-dom/test-utils';
 import EnvironmentFlag from '..';
 
-jest.mock('./../../Flag', () => 'mock-flag');
+jest.mock('./../../Flag');
 
 let component = null;
 
@@ -25,6 +25,3 @@ describe('<EnvironmentFlag />', () => {
   });
 
 }); 
-
-
-   

@@ -1,0 +1,1 @@
+export const UNAVAILABLE_COUNTRIES_ERROR = 'The following selected markets are not available for ';

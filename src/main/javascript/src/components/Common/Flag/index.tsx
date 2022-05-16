@@ -5,7 +5,7 @@ import { FlagProps } from './types';
 
 import styles from './index.module.scss';
 
-const Flag: React.FC<FlagProps> = ({ country }: FlagProps) => {
+const Flag: React.FC<FlagProps> = ({ country, isSmall }: FlagProps) => {
   if (!country) return null;
 
   return (
@@ -13,7 +13,8 @@ const Flag: React.FC<FlagProps> = ({ country }: FlagProps) => {
       data-testid="flag-component"
       className={classnames(
         styles.flagIcon,
-        `flag-icon flag-icon-${country.toLowerCase()}`
+        `flag-icon flag-icon-${country.toLowerCase()}`,
+        isSmall && styles.smallIcon
       )}
     />
   );

@@ -1,14 +1,14 @@
-
 import {
   Affiliate,
-  AffiliatePostback, 
-  AffiliateThreshold, 
+  AffiliatePostback,
+  AffiliateThreshold,
   AffiliatePostbackType,
 } from './../types';
 
-import { ValidationObject, ValidationType } from '~/types';
+import { Brand, ValidationObject, ValidationType } from '~/types';
 
 import { validateUrl } from '~/utils/common';
+import { containsUnavailableCountries } from '~/pages/affiliate-edit/AffiliateBaseSettingsForm/utils';
 
 const validateThresholds = (threshold: AffiliateThreshold, postbackId: number, thresholdIndex: number): ValidationObject[] => {
   const errors: ValidationObject[] = [];
@@ -42,7 +42,7 @@ const validateThresholds = (threshold: AffiliateThreshold, postbackId: number, t
   return errors;
 };
 
-const validatePostback = (postback: AffiliatePostback, temporaryId: number): ValidationObject[] => {
+const validatePostback = (postback: AffiliatePostback, temporaryId: number, selectedBrands: Brand[]): ValidationObject[] => {
   let errors: ValidationObject[] = [];
 
   const postbackId = postback.id ? postback.id : temporaryId;
@@ -62,7 +62,7 @@ const validatePostback = (postback: AffiliatePostback, temporaryId: number): Val
       errors.push({
         relatedElement: 'postback_url',
         type: ValidationType.Error,
-        message:  `URL is not valid, it has to start with https://. Postback with ID ${postbackId}. (${postback.url})`,
+        message: `URL is not valid, it has to start with https://. Postback with ID ${postbackId}. (${postback.url})`,
       });
     }
   }
@@ -84,11 +84,24 @@ const validatePostback = (postback: AffiliatePostback, temporaryId: number): Val
     }
   }
 
+  selectedBrands.forEach((brand) => {
+    try {
+      containsUnavailableCountries(brand, postback.countries);
+    } catch (e) {
+      if (e instanceof Error) {
+        errors.push({
+          type: ValidationType.Error,
+          message: `${brand.label} - ${postback.name || postback.id}: ${e.toString()}`,
+        });
+      }
+    }
+  });
+
   return errors;
 };
 
-export const affiliateValidation = (affiliate: Affiliate): ValidationObject[] => {
-  let errors: ValidationObject[] = [];
+export const affiliateValidation = (affiliate: Affiliate, selectedBrands: Brand[]): ValidationObject[] => {
+  const errors: ValidationObject[] = [];
 
   const {
     affiliateId,
@@ -124,10 +137,8 @@ export const affiliateValidation = (affiliate: Affiliate): ValidationObject[] =>
   }
 
   postbacks?.forEach((postback: AffiliatePostback, index: number) => {
-    const postbackErrors = validatePostback(postback, index);
-    if (postbackErrors.length) {
-      errors = errors.concat(postbackErrors);
-    }
+    validatePostback(postback, index, selectedBrands)
+      .forEach(error => errors.push(error));
   });
 
   return errors;

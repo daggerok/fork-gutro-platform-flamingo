@@ -22,8 +22,8 @@ export const AffiliateContext = createContext<AffiliateContextProps>({
   setAffiliateErrors: () => {},
   savedAffiliate: null,
   setSavedAffiliate: () => {},
-  selectedBrand: null,
-  setSelectedBrand: () => {},
+  selectedBrands: [],
+  setSelectedBrands: () => [],
   brands: [],
   setBrands: () => {},
   saved: true,
@@ -35,7 +35,7 @@ const AffiliateContextProvider: React.FC<AffiliateContextProviderProps> = ({ chi
   const [currentAffiliate, setCurrentAffiliate] = useState(null);
   const [affiliateErrors, setAffiliateErrors] = useState([]);
   const [savedAffiliate, setSavedAffiliate] = useState(null);
-  const [selectedBrand, setSelectedBrand] = useState(null);
+  const [selectedBrands, setSelectedBrands] = useState([]);
   const [brands, setBrands] = useState([]);
   const [saved, setSaved] = useState(true);
 
@@ -50,8 +50,8 @@ const AffiliateContextProvider: React.FC<AffiliateContextProviderProps> = ({ chi
         setAffiliateErrors,
         savedAffiliate,
         setSavedAffiliate,
-        selectedBrand,
-        setSelectedBrand,
+        selectedBrands,
+        setSelectedBrands,
         brands,
         setBrands,
         saved,

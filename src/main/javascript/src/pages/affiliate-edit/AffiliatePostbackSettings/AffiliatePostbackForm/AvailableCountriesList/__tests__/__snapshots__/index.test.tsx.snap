@@ -1,0 +1,136 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<AvailableCountriesList /> renders correctly by default 1`] = `
+<DocumentFragment>
+  <button
+    class="ant-btn ant-btn-ghost ant-btn-sm countryTag"
+    data-testid="country-button-NO"
+    type="button"
+  >
+    <mock-flag
+      country="NO"
+      issmall="true"
+    />
+    <span
+      class="countryIso"
+    >
+      NO
+    </span>
+  </button>
+  <button
+    class="ant-btn ant-btn-ghost ant-btn-sm countryTag"
+    data-testid="country-button-SE"
+    type="button"
+  >
+    <mock-flag
+      country="SE"
+      issmall="true"
+    />
+    <span
+      class="countryIso"
+    >
+      SE
+    </span>
+  </button>
+  <div
+    class="ant-alert ant-alert-info ant-alert-no-icon"
+    data-show="true"
+    role="alert"
+  >
+    <div
+      class="ant-alert-content"
+    >
+      <div
+        class="ant-alert-message"
+      >
+        No selected country will enable this postback on all markets.
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`<AvailableCountriesList /> renders correctly with selected countries 1`] = `
+<DocumentFragment>
+  <button
+    class="ant-btn ant-btn-ghost ant-btn-sm countryTag"
+    data-testid="country-button-NO"
+    type="button"
+  >
+    <mock-flag
+      country="NO"
+      issmall="true"
+    />
+    <span
+      class="countryIso"
+    >
+      NO
+    </span>
+  </button>
+  <button
+    class="ant-btn ant-btn-primary ant-btn-sm countryTag"
+    data-testid="country-button-SE"
+    type="button"
+  >
+    <mock-flag
+      country="SE"
+      issmall="true"
+    />
+    <span
+      class="countryIso"
+    >
+      SE
+    </span>
+  </button>
+</DocumentFragment>
+`;
+
+exports[`<AvailableCountriesList /> renders correctly with selected country that isn't in all brands 1`] = `
+<DocumentFragment>
+  <button
+    class="ant-btn ant-btn-ghost ant-btn-sm countryTag"
+    data-testid="country-button-NO"
+    type="button"
+  >
+    <mock-flag
+      country="NO"
+      issmall="true"
+    />
+    <span
+      class="countryIso"
+    >
+      NO
+    </span>
+  </button>
+  <button
+    class="ant-btn ant-btn-ghost ant-btn-sm countryTag"
+    data-testid="country-button-SE"
+    type="button"
+  >
+    <mock-flag
+      country="SE"
+      issmall="true"
+    />
+    <span
+      class="countryIso"
+    >
+      SE
+    </span>
+  </button>
+  <button
+    class="ant-btn ant-btn-primary ant-btn-sm ant-btn-dangerous countryTag"
+    data-testid="country-button-BATMAN"
+    type="button"
+  >
+    <mock-flag
+      country="BATMAN"
+      issmall="true"
+    />
+    <span
+      class="countryIso"
+    >
+      BATMAN
+    </span>
+  </button>
+</DocumentFragment>
+`;

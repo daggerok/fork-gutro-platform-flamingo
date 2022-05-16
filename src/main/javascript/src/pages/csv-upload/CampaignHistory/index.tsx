@@ -18,6 +18,8 @@ import {
 import styles from './CampaignHistory.module.scss';
 import tableColumns from './historytable-columns';
 
+const { RangePicker }: any = DatePicker;
+
 const CampaignHistory: React.FC<CampaignHistoryProps> = ({ shouldUpdate, showCampaignDetails }: CampaignHistoryProps) => {
   const [ isLoading, setIsLoading ] = useState(true);
   const [ campaignHistory, setCampaignHistory ] = useState([]);
@@ -66,7 +68,7 @@ const CampaignHistory: React.FC<CampaignHistoryProps> = ({ shouldUpdate, showCam
         <Typography.Title level={3}>Scheduling history</Typography.Title>
 
         <div>
-          <DatePicker.RangePicker
+          <RangePicker
             className={styles.datePicker}
             format="yyyy-MM-DD"
             ranges={{

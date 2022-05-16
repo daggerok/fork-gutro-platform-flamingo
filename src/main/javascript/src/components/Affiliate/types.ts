@@ -10,8 +10,8 @@ export type AffiliateContextProps = {
   setAffiliateErrors: (affiliateErrors: any) => void;
   savedAffiliate: any | null;
   setSavedAffiliate: (savedAffiliate: any | null) => void;
-  selectedBrand: Brand | null;
-  setSelectedBrand: (selectedBrand: any | null) => void;
+  selectedBrands: Brand[] | [];
+  setSelectedBrands: (selectedBrand: any | null) => void;
   brands: Brand[];
   setBrands: (brands: any | null) => void;
   saved: boolean;

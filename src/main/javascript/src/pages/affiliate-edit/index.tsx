@@ -51,6 +51,7 @@ const AffiliateEdit: React.FC = () => {
     setBrands,
     setSaved,
     saved,
+    selectedBrands,
   } = useContext(AffiliateContext);
 
   const [title, setTitle] = useState('Add Affiliate');
@@ -141,14 +142,18 @@ const AffiliateEdit: React.FC = () => {
 
   const openNotification = (error: ValidationObject): void => {
     notification.open({
+      placement: 'top',
       type: error.type,
       message: error.message,
       duration: 8,
+      style: {
+        width: '100%',
+      },
     });
   };
 
   const onAffiliateSave = (): void => {
-    const errors = affiliateValidation(currentAffiliate);
+    const errors = affiliateValidation(currentAffiliate, selectedBrands);
 
     if (errors.length) {
       errors.forEach((error) => { if (error) { openNotification(error); }});

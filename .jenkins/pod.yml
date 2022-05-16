@@ -13,7 +13,7 @@ spec:
   # </leo-ci:affinity>
   containers:
     - name: node
-      image: eu.gcr.io/leo-platform-infra/leo-ci/build/node:12.16-slim
+      image: eu.gcr.io/leo-platform-infra/leo-ci/build/node:16-bullseye-couchbase
       imagePullPolicy: Always
       securityContext:
         runAsUser: 1000

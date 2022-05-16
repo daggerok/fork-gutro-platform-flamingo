@@ -102,7 +102,7 @@ exports[`<Layout /> when authenticated is true matches snapshot when authenticat
       class="logoutButton"
     >
       <button
-        class="ant-btn ant-btn-background-ghost"
+        class="ant-btn ant-btn-default ant-btn-background-ghost"
         data-testid="logout-button-wrapper"
         type="button"
       >

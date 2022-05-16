@@ -54,6 +54,8 @@ const getResultPopupMessage = (key: string | number): string => {
   }
 };
 
+const DatePickerComponent: any = DatePicker;
+
 const CSVUploadForm: React.FC<CSVUploadFormProps> = ({ onUpdate }: CSVUploadFormProps) => {
   const [ confirmationModalOpen, setConfirmationModalOpen ] = useState<boolean>(false);
   const [ resultPopup, setResultPopup ] = useState<ResultPopupData | null>(null);
@@ -172,7 +174,7 @@ const CSVUploadForm: React.FC<CSVUploadFormProps> = ({ onUpdate }: CSVUploadForm
           name="scheduleDate"
           rules={FORM_RULES.scheduleDate}
         >
-          <DatePicker
+          <DatePickerComponent
             className={styles.datePicker}
             format="YYYY-MM-DD HH:mm"
             placeholder={`Schedule date (GMT${timeZoneOffset})`}

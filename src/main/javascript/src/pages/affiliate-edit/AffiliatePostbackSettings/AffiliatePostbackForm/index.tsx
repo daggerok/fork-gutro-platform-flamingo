@@ -1,47 +1,23 @@
-import React, { useState, useEffect, useContext } from 'react';
-
 import {
-  Form,
-  Tag,
-  Input,
-  Button,
-  Row,
-  Col,
-  Collapse,
-  Typography,
-  Divider,
-  Alert,
-  message,
+  Alert, Button, Col, Collapse, Divider, Form, Input, message, Row, Tag, Typography,
 } from 'antd';
-
-import idx from 'idx';
-
-import {
-  DeleteFilled,
-  PlusCircleOutlined,
-  CloseCircleFilled,
-  EditFilled,
-  PlusOutlined,
-} from '@ant-design/icons';
-
-import { Country, Brand } from '~/types';
-
+import React, { useContext, useEffect, useState } from 'react';
+import { AffiliateContext } from '~/components/Affiliate/AffiliateContextProvider';
+import { AffiliatePostbackType } from '~/components/Affiliate/types';
+import ConfirmationDialog from '~/components/Common/ConfirmationDialog';
 import { validateUrl } from '~/utils/common';
 
-import { AffiliatePostbackType } from '~/components/Affiliate/types';
-import { AffiliateContext } from '~/components/Affiliate/AffiliateContextProvider';
+import {
+  CloseCircleFilled, DeleteFilled, EditFilled, PlusCircleOutlined, PlusOutlined,
+} from '@ant-design/icons';
 
-import ConfirmationDialog from '~/components/Common/ConfirmationDialog';
-import Flag from '~/components/Common/Flag';
-
-import AffiliateDrawer from './../AffiliateDrawer';
+import AffiliateDrawer from '../AffiliateDrawer';
+import styles from './AffiliatePostbackForm.module.scss';
 import AffiliateThresholdForm from './AffiliateThresholdForm';
+import AvailableCountriesList from './AvailableCountriesList';
 import { AffiliatePostbackFormProps } from './types';
 
-import styles from './AffiliatePostbackForm.module.scss';
-
 const { Panel } = Collapse;
-const { CheckableTag } = Tag;
 const { Text } = Typography;
 
 const AffiliatePostbackForm: React.FC<AffiliatePostbackFormProps> = ({
@@ -50,28 +26,22 @@ const AffiliatePostbackForm: React.FC<AffiliatePostbackFormProps> = ({
   deletePostback,
   hasEditRights,
 }: AffiliatePostbackFormProps) => {
-
   const [selectedEvent, setSelectedEvent] = useState('');
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
   const [postbackToDelete, setPostbackToDelete] = useState<number | null>(null);
-  const [selectedMarketSources, setSelectedMarketingSources] = useState<Array<string>>([]);
+  const [selectedMarketSources, setSelectedMarketingSources] = useState<
+    Array<string>
+  >([]);
   const [selectedCountries, setSelectedCountries] = useState<Array<string>>([]);
-  const [availableCountries, setAvailableCountries] = useState<Array<any>>([]);
 
-  const { 
-    currentAffiliate, 
+  const {
+    currentAffiliate,
     setCurrentAffiliate,
     setAffiliateErrors,
-    selectedBrand,
-    setSelectedBrand,
-    brands,
+    selectedBrands,
   } = useContext(AffiliateContext);
 
   let marketSourceToAdd = '';
-
-  const getSelectedBrandObjectFromOperatorUid = (operatorUid: string): any => {
-    return brands.find((brand: Brand) => brand.brand === operatorUid);
-  };
 
   useEffect(() => {
     setSelectedEvent(postback.type);
@@ -80,60 +50,54 @@ const AffiliatePostbackForm: React.FC<AffiliatePostbackFormProps> = ({
     } else {
       setSelectedMarketingSources(postback.marketingSourceIDs);
     }
-    
+
     if (postback.countries) {
       setSelectedCountries(postback.countries);
     }
-    if (currentAffiliate.operatorUIDs) {
-      const brandObject = getSelectedBrandObjectFromOperatorUid(currentAffiliate.operatorUIDs[0]);
-      setSelectedBrand(brandObject);
-    }
   }, [currentAffiliate]);
-
-
-  useEffect(() => {
-    const countries = idx(selectedBrand, (_) => _.countries);
-    if (countries) {
-      setAvailableCountries(countries);  
-    }
-  }, [selectedBrand]);
 
   // tslint:disable-next-line
   const handleNameChange = (event: any): void => {
     postback.name = event.target.value;
 
-    setCurrentAffiliate({...currentAffiliate});
+    setCurrentAffiliate({ ...currentAffiliate });
   };
 
   // tslint:disable-next-line
-  const handleUrlChange = (event: any): void  => {
+  const handleUrlChange = (event: any): void => {
     const validated = validateUrl(event.target.value);
     postback.url = event.target.value;
-    if (!validated) { 
-      const errors = [{
-        error: true,
-        errorMessage: 'Postback url not valid',
-      }];
+    if (!validated) {
+      const errors = [
+        {
+          error: true,
+          errorMessage: 'Postback url not valid',
+        },
+      ];
       setAffiliateErrors([...errors]);
     }
 
-    setCurrentAffiliate({...currentAffiliate});
+    setCurrentAffiliate({ ...currentAffiliate });
   };
 
   // tslint:disable-next-line
-  const handleMarketingSourceChange = (event: any): void  => {
+  const handleMarketingSourceChange = (event: any): void => {
     marketSourceToAdd = event.target.value;
   };
 
-  const updateMarketingSourceIds = (mutatedMarketSources: Array<string>): void => {
+  const updateMarketingSourceIds = (
+    mutatedMarketSources: Array<string>
+  ): void => {
     setSelectedMarketingSources(mutatedMarketSources);
     postback.marketingSourceIDs = mutatedMarketSources;
 
-    setCurrentAffiliate({...currentAffiliate}); 
+    setCurrentAffiliate({ ...currentAffiliate });
   };
 
-  const addMarketSource = (): void  => {
-    if (!marketSourceToAdd) { return; }
+  const addMarketSource = (): void => {
+    if (!marketSourceToAdd) {
+      return;
+    }
     const mutatedSelectedMarketSources = [...selectedMarketSources];
     mutatedSelectedMarketSources.push(marketSourceToAdd);
     marketSourceToAdd = '';
@@ -142,11 +106,15 @@ const AffiliatePostbackForm: React.FC<AffiliatePostbackFormProps> = ({
 
   const removeSelectedMarketSource = (marketSourceToRemove: string): void => {
     const mutatedSelectedMarketSources = [...selectedMarketSources];
-    if (!mutatedSelectedMarketSources.find(selectedMarketSource => selectedMarketSource === marketSourceToRemove)) { return; } 
-    
+    if (!mutatedSelectedMarketSources.find((selectedMarketSource) => selectedMarketSource === marketSourceToRemove)) {
+      return;
+    }
+
     const index = mutatedSelectedMarketSources.indexOf(marketSourceToRemove);
-    if (index > -1) { mutatedSelectedMarketSources.splice(index, 1); }
-    
+    if (index > -1) {
+      mutatedSelectedMarketSources.splice(index, 1);
+    }
+
     updateMarketingSourceIds(mutatedSelectedMarketSources);
   };
 
@@ -161,7 +129,7 @@ const AffiliatePostbackForm: React.FC<AffiliatePostbackFormProps> = ({
       const mutatedThresholds = [...thresholds];
       mutatedThresholds.splice(index, 1);
       postback.thresholds = mutatedThresholds;
-      setCurrentAffiliate({...currentAffiliate});
+      setCurrentAffiliate({ ...currentAffiliate });
     }
   };
 
@@ -177,33 +145,37 @@ const AffiliatePostbackForm: React.FC<AffiliatePostbackFormProps> = ({
       url: null,
     };
 
-    if (!currentAffiliate?.postbacks.length) { return; }
+    if (!currentAffiliate?.postbacks.length) {
+      return;
+    }
 
     const depositThresholdPostback = currentAffiliate.postbacks[postbackIndex];
 
-    if (!depositThresholdPostback.thresholds) { depositThresholdPostback.thresholds = []; }
+    if (!depositThresholdPostback.thresholds) {
+      depositThresholdPostback.thresholds = [];
+    }
 
     const mutatedThresholds = [...depositThresholdPostback.thresholds];
 
     mutatedThresholds.push(emptyThreshold);
     depositThresholdPostback.thresholds = mutatedThresholds;
 
-    setCurrentAffiliate({...currentAffiliate });
-  }; 
+    setCurrentAffiliate({ ...currentAffiliate });
+  };
 
   const updateCountries = (mutatedSelectedCountries: string[]): void => {
     postback.countries = mutatedSelectedCountries;
     setSelectedCountries(mutatedSelectedCountries);
-    setCurrentAffiliate({...currentAffiliate});
+    setCurrentAffiliate({ ...currentAffiliate });
   };
 
   const handleCountryChange = (country: string): void => {
-    if (!hasEditRights) { 
+    if (!hasEditRights) {
       message.error('You do not have permission to change that!');
       return;
     }
     const mutatedSelectedCountries = [...selectedCountries];
-    if (mutatedSelectedCountries.includes(country)) { 
+    if (mutatedSelectedCountries.includes(country)) {
       const index = mutatedSelectedCountries.indexOf(country);
       mutatedSelectedCountries.splice(index, 1);
     } else {
@@ -212,19 +184,22 @@ const AffiliatePostbackForm: React.FC<AffiliatePostbackFormProps> = ({
 
     updateCountries(mutatedSelectedCountries);
   };
-  
+
   const { name } = postback || null;
-  const description = name && name.length > 30 ? `${name.substring(0,30)}...` : name;
+  const description =
+    name && name.length > 30 ? `${name.substring(0, 30)}...` : name;
 
   const panelHeader = (
     <Row className={styles.panelHeaderRow}>
-      <Col span="7"><h3>{selectedEvent}</h3></Col>
+      <Col span="7">
+        <h3>{selectedEvent}</h3>
+      </Col>
       <Col span="12">
-        <h4>{ postback.name && <span>{description}</span>}</h4>
+        <h4>{postback.name && <span>{description}</span>}</h4>
       </Col>
       <Col span="1">
-        <Tag color='#BE94F0'>
-          <strong>ID</strong> { postback.id ? postback.id : postbackIndex }
+        <Tag color="#BE94F0">
+          <strong>ID</strong> {postback.id ? postback.id : postbackIndex}
         </Tag>
       </Col>
       <Col span="4">
@@ -245,23 +220,31 @@ const AffiliatePostbackForm: React.FC<AffiliatePostbackFormProps> = ({
   );
 
   return (
-    <Collapse 
+    <Collapse
       accordion
-      expandIcon={({isActive}): JSX.Element => isActive ?  <CloseCircleFilled/> : <EditFilled />}
-      defaultActiveKey={postback.id ? -1 : postbackIndex}
-    >
-      { showConfirmationDialog &&
-      <ConfirmationDialog 
-        onOkClick={onOkDeletePostbackClick}
-        onCancelClick={(): void => { setShowConfirmationDialog(false); }}
-        title="Are you sure?" 
-        subTitle="This action will remove this postback setting." 
-      />
+      expandIcon={({ isActive }): JSX.Element =>
+        isActive ? <CloseCircleFilled /> : <EditFilled />
       }
-      <Panel 
-        header={panelHeader} 
-        key={postbackIndex} 
-        style={{ position: 'relative', backgroundColor: postback.id ? '#fafafa' : '#ffb2b2' }}
+      defaultActiveKey={postback.id ? -1 : postbackIndex}
+      data-testid="postback-accordion"
+    >
+      {showConfirmationDialog && (
+        <ConfirmationDialog
+          onOkClick={onOkDeletePostbackClick}
+          onCancelClick={(): void => {
+            setShowConfirmationDialog(false);
+          }}
+          title="Are you sure?"
+          subTitle="This action will remove this postback setting."
+        />
+      )}
+      <Panel
+        header={panelHeader}
+        key={postbackIndex}
+        style={{
+          position: 'relative',
+          backgroundColor: postback.id ? '#fafafa' : '#ffb2b2',
+        }}
       >
         <Form
           className={styles.settingsForm}
@@ -288,76 +271,62 @@ const AffiliatePostbackForm: React.FC<AffiliatePostbackFormProps> = ({
           ]}
         >
           <fieldset>
-            
-          <Form.Item label="Name">
-            <Input.TextArea
-              name="postbackName"
-              disabled={!hasEditRights}
-              onChange={handleNameChange}
-              value={postback.name}
-              maxLength={255}
-            />
-            <Text type="secondary">{`Max 255 characters. Current count: ${postback?.name?.length}.`}</Text>
-          </Form.Item>
-          <Form.Item 
-            name='postbackCountries'
-            label="Countries"
-          >
-          { !selectedBrand && 
-            <Alert 
-              type="warning" 
-              message="Select brand to view available markets." 
-            />
-          }
-          {
-            availableCountries.filter((country: Country) => country.active)
-              .map((country: Country) =>
-                <CheckableTag
-                  className={styles.countryTag}
-                  key={country.iso}
-                  checked={selectedCountries.includes(country.iso)}
-                  onChange={(): void => handleCountryChange(country.iso)}
-                >
-                  <Flag country={country.iso}/><span className={styles.countryIso}>{country.iso}</span>
-                </ CheckableTag>
-              )
-          }
-          { selectedCountries[0] === '' || !selectedCountries.length &&  
-            <Alert 
-              type="info" 
-              message="No selected country will enable this postback on all markets." 
-            />
-          }
-          </Form.Item>
-          <Form.Item label="Marketing sources">
-            <Row>
-              <Col span={12}>
-                <div className={styles.tagContainer}>
-                  {selectedMarketSources && selectedMarketSources.map((marketSource): JSX.Element => {
-                    return (
-                      <Tag
-                        className="marketingSourceTag"
-                        key={marketSource}
-                        color="magenta"
-                        closable={hasEditRights}
-                        onClose={(): void => {
-                          removeSelectedMarketSource(marketSource);
-                        }}
-                      >
-                        {marketSource}
-                      </Tag>
-                    );
-                  })}
-                </div>
-              </Col>
-            </Row>
+            <Form.Item label="Name">
+              <Input.TextArea
+                name="postbackName"
+                disabled={!hasEditRights}
+                onChange={handleNameChange}
+                value={postback.name}
+                maxLength={255}
+              />
+              <Text type="secondary">{`Max 255 characters. Current count: ${postback?.name?.length}.`}</Text>
+            </Form.Item>
+            <Form.Item
+              name="postbackCountries"
+              label="Countries"
+            >
+              {(!selectedBrands || !selectedBrands.length) && (
+                <Alert
+                  type="warning"
+                  message="Select brand to view available markets."
+                />
+              )}
+              <AvailableCountriesList
+                selectedCountries={selectedCountries}
+                selectedBrands={selectedBrands}
+                onCountryToggled={handleCountryChange}
+              />
+            </Form.Item>
+            <Form.Item label="Marketing sources">
+              <Row>
+                <Col span={12}>
+                  <div className={styles.tagContainer}>
+                    {selectedMarketSources &&
+                      selectedMarketSources.map((marketSource): JSX.Element => {
+                        return (
+                          <Tag
+                            className="marketingSourceTag"
+                            key={marketSource}
+                            color="magenta"
+                            closable={hasEditRights}
+                            onClose={(): void => {
+                              removeSelectedMarketSource(marketSource);
+                            }}
+                          >
+                            {marketSource}
+                          </Tag>
+                        );
+                      })}
+                  </div>
+                </Col>
+              </Row>
               <Row>
                 <Col span={20}>
                   <Form.Item name="marketingSources">
-                    <Input 
+                    <Input
                       disabled={!hasEditRights}
                       allowClear
-                      onChange={handleMarketingSourceChange} 
+                      onChange={handleMarketingSourceChange}
                     />
                   </Form.Item>
                 </Col>
@@ -368,7 +337,7 @@ const AffiliatePostbackForm: React.FC<AffiliatePostbackFormProps> = ({
                     icon={<PlusCircleOutlined />}
                     type="primary"
                     onClick={(): void => {
-                      addMarketSource();     
+                      addMarketSource();
                     }}
                   />
                 </Col>
@@ -382,60 +351,68 @@ const AffiliatePostbackForm: React.FC<AffiliatePostbackFormProps> = ({
                   {
                     required: true,
                     type: 'url',
-                    message: 'Make sure you use a valid url and that it starts with https://',
+                    message:
+                      'Make sure you use a valid url and that it starts with https://',
                   },
                 ]}
               >
-                <label><small><em>Must start with <strong>https://</strong></em></small></label>
+                <label>
+                  <small>
+                    <em>
+                      Must start with <strong>https://</strong>
+                    </em>
+                  </small>
+                </label>
                 <Input
                   disabled={!hasEditRights}
                   onChange={handleUrlChange}
                   value={postback.url}
                 />
-                { postback.url && postback.url.length > 65 &&
-                  <Alert 
-                    type="info" 
+                {postback.url && postback.url.length > 65 && (
+                  <Alert
+                    type="info"
                     message={postback.url}
                   />
-                }
+                )}
               </Form.Item>
             )}
             {selectedEvent === AffiliatePostbackType.THRESHOLD_DEPOSIT && (
               <>
-              <Row justify="end"> 
-                <Divider />
-                <Col>
-                  <Button
-                    disabled={!hasEditRights}
-                    className={styles.addThresholdButton}
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    size="small"
-                    onClick={addThreshold}
-                  >
-                    Add Threshold
-                  </Button>
-                </Col>
-              </Row>
-              <Row>
-                <Col span={24}>
-                  <h4 >Threshold settings</h4>
-                </Col>
-              </Row>
-                { postback.thresholds && postback.thresholds?.map((threshold, index): JSX.Element => {
-                  return (
-                    <AffiliateThresholdForm 
-                      key={index}
-                      index={index}
-                      threshold={threshold} 
-                      deleteThreshold={deleteThreshold}
-                      hasEditRights={hasEditRights}
-                    />
-                  );
-                })}
+                <Row justify="end">
+                  <Divider />
+                  <Col>
+                    <Button
+                      disabled={!hasEditRights}
+                      className={styles.addThresholdButton}
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      size="small"
+                      onClick={addThreshold}
+                    >
+                      Add Threshold
+                    </Button>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={24}>
+                    <h4>Threshold settings</h4>
+                  </Col>
+                </Row>
+                {postback.thresholds &&
+                  postback.thresholds?.map((threshold, index): JSX.Element => {
+                    return (
+                      <AffiliateThresholdForm
+                        key={index}
+                        index={index}
+                        threshold={threshold}
+                        deleteThreshold={deleteThreshold}
+                        hasEditRights={hasEditRights}
+                      />
+                    );
+                  })}
               </>
             )}
-            <Row justify="end"> 
+            <Row justify="end">
               <Col>
                 <AffiliateDrawer />
               </Col>

@@ -1,8 +1,21 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<Flag /> matches snapshot 1`] = `
-<span
-  class="flagIcon flag-icon flag-icon-mt"
-  data-testid="flag-component"
-/>
+exports[`<Flag /> by default 1`] = `
+<DocumentFragment>
+  <span
+    class="flagIcon flag-icon flag-icon-mt"
+    data-testid="flag-component"
+  />
+</DocumentFragment>
 `;
+
+exports[`<Flag /> with small size 1`] = `
+<DocumentFragment>
+  <span
+    class="flagIcon flag-icon flag-icon-se smallIcon"
+    data-testid="flag-component"
+  />
+</DocumentFragment>
+`;
+
+exports[`<Flag /> without countrry 1`] = `<DocumentFragment />`;

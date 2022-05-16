@@ -1,0 +1,9 @@
+.countryTag {
+  margin-left: 6px;
+  margin-top: 6px;
+
+  & .countryIso {
+    font-weight: bold;
+    margin-left: 10px;
+  }
+}

@@ -18,7 +18,7 @@ const readFile = (file: File): Promise<string> => {
 
     fileReader.onload = (e): void => {
       if (e?.target && e.target.readyState == FileReader.DONE) {
-        resolve(e.target.result?.toString());
+        resolve(e.target.result?.toString() || '');
       }
     };
     
